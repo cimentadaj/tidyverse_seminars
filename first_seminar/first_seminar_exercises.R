@@ -1,19 +1,19 @@
 # Start of exercises for first seminar
+# Author: Jorge Cimentada
+# Session: First tidyverse seminars
 
 # Briefly, let's recap the main tools you'll use.
 
 # Packages:
-library(fivethirtyeight)
-library(readr)
-library(readxl)
-library(haven)
-library(car)
+library(readr) # Reading csv
+library(haven) # Reading STATA, SPSS or SAS
+library(car) # For recoding
+library(forcats) # For factor variables
 library(tidyverse)
 
-
 # Usual ggplot2 structure
-ggplot(data = <DATA>) + 
-  <GEOM_FUNCTION>(mapping = aes(<MAPPINGS>))
+ggplot(data = <DATA>, aes(<MAPPINGS>)) + 
+  <GEOM_FUNCTION>()
 
 # Most common geoms:
 geom_point()
@@ -52,114 +52,150 @@ read_spss() # SPSS (.sav) files
 read_sas() # SAS files
 read_excel() # Read .xls or .xlsx
 
-# Start of exercises:
+# 1. Reading the data
 
-pisa_2015 <- read_spss("/Users/cimentadaj/Downloads/PISA/CY6_MS_CMB_STU_QQQ.sav")
-pisa <- pisa_2015
-
-# Function recevies a variable with an attribute label
-# and recodes the variable to availabe lables
-# Returns the same variable with new codings
-variable_labeller <- function(variable) {
-  
-  if (!is.null(attr(variable, "labels"))) {
-    
-    var_attr <- attributes(variable)
-    label_changer <- reverse_name(attr(variable, "labels"))
-    variable <- label_changer[variable]
-    
-    attributes(variable) <- var_attr
-    variable
-  }
-}
-
-pisa <-
-  pisa %>%
-  mutate(Region = countrycode(CNT, "iso3c", "continent"),
-         CNT = as.character(variable_labeller(CNT))) %>%
-  sample_n(10000)
-
-
-
-write_csv(pisa, "./data/pisa2015.csv")
-
-# bad_vars <- map_lgl(pisa, function(x) is.labelled(x) && is_double(x))
-# pisa_2 <- pisa
-# pisa_2[bad_vars] <- map_df(pisa_2[bad_vars], is.integer)
-# 
-# map_lgl(pisa_2, function(variable) {
-#   any(map_lgl(names(attr(pisa_2$STRATUM, "labels")), function(labels) nchar(labels) > 31))
-# })
-
-# write_dta(pisa_2, "./data/pisa2015.dta")
-# write_sav(pisa, "./data/pisa2015.sav")
-
-# CSV URL to the data
+# URL's to the data
 csv_dir <- "https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/first_seminar/data/pisa2015.csv"
+spss_dir <- "https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/first_seminar/data/pisa2015.csv"
 
-pisa_2015 <- read_csv(csv_dir)
+# Depending on your usual statistical software, read the corresponding directory
+# with the appropriate function by placing the *_dir object inside the function
+# and assign the dataset the name pisa_2015
 
-# Avoid the dplyr::select problem
+read_csv()
+read_spss()
 
-# Let's figure out which gender has more books in the household
+# 2. Cleaning the data
+
+# We want to rename some variables, delete others and do some recoding.
+# Read first and then complete the exercises below!!
+
+# Using the pipe, pipe the pisa_2015 into the rename function and rename these
+# variables:
+
+# country = CNT
+# region = Region
+# school_id = CNTSCHID
+# gender = ST004D01T
+# books_in_hh = ST013Q01TA
+# math_score = PV1MATH
+
+# Pipe the result of rename to the select function and select the same variables
+# you just renamed.
+
+# Finally, pipe the result of select to the mutate function and create a new gender
+# variable called gender that includes this code as the new variable:
+# car::recode(gender, "1 = 'Female'; 2 = 'Male'")
+
+# Below is an empty skeleton of what you need to do:
+
 summary_pisa <-
-  pisa_2015 %>%
-  rename(country = CNT,
-         school_id = CNTSCHID,
-         gender = ST004D01T,
-         books_in_hh = ST013Q01TA,
-         math_score = PV1MATH) %>%
-  dplyr::select(country, school_id, gender, books_in_hh, math_score) %>%
-  mutate(gender = car::recode(gender, "1 = 'Female'; 2 = 'Male'"))
+  data %>%
+  rename variables %>%
+  select variables %>%
+  create the new gender variable with the recode from above
 
-# Check the overall math mean
-summary_pisa %>%
-  summarise(mean(math_score, na.rm = T))
+# 3. Exploratory Data Analysis (EDA)
 
-# Check the between country mean and arrange to see the best performer in math
-summary_pisa %>%
-  group_by(country) %>%
-  summarise(avg_country = mean(math_score, na.rm = T)) %>%
-  arrange(-avg_country) # Also try with - sign
+# In the previous expression we saved our new summarized data as 'summary_pisa'.
+# Let's have a look:
+summary_pisa
 
-# Repeat the same as before but group by gender
-summary_pisa %>%
-  group_by(country, gender) %>%
-  summarise(avg_country = mean(math_score, na.rm = T)) %>%
-  arrange(-avg_country)  %>%
-  ggplot(aes(x = reorder(country, avg_country),
-             y = avg_country,
-             colour = gender)) +
-  geom_point(alpha = 0.6) +
-  coord_flip()
+# Now we want to calculate the overall math mean.
+# You can do that by piping the summary_pisa data into the summarise
+# function and create a new variable called avg_math which uses the
+# mean() function over the 'math_score' variable to get the overall mean.
+# Don't forget to include na.rm = T to exclude missings!
 
-# Let's pick a country and check the distribution of books in the household
-summary_pisa %>%
-  filter(country == "Spain") %>%
-  ggplot(aes(country, books_in_hh)) +
-  geom_boxplot()
+Your answer
 
-# Group by gender now:
-summary_pisa %>%
-  filter(country == "Spain") %>%
-  ggplot(aes(gender, books_in_hh)) +
-  geom_boxplot()
+# Let's do similarly as before but calculate the average for each country. 
+# That way we can see which are the top performers and which are the worst.
+# You can do that by piping 'summary_pisa' to the group_by() function and
+# grouping by the variable 'country'. Then repeat the summarise command from
+# the previous exercises.
 
-# Step back and choose another country
-summary_pisa %>%
-  filter(country %in% c("Spain", "United States")) %>%
-  ggplot(aes(gender, books_in_hh)) +
-  geom_boxplot() +
-  facet_wrap(~ country)
+Your answer
+
+# Wait! Before finishing, we'd want to see the worst and best performers.
+# Try piping the previous expression to the arrange() function and sorting
+# by the variable 'avg_country'. When you do, experiment by placing a minus
+# sign infront of the 'avg_country' variable.
+
+########################################################################
+
+# We're interested in the gender gap in math for each country.
+# With the tidyverse this is very easy. Copy the previous expression below
+# this paragraph. How would you do it? We simply need to estimate the
+# score for males and females (variable gender).
+
+# Think about it this way: right now we're grouping by country..
+# and we want to get the score for each country by Male and Female as well.
+
+Your answer
+
+# We got the results! But visualizing is the best way of understanding
+# patterns. Copy the previous expression below this text.
+
+# Pipe the whole expression to the ggplot function. Inside
+# ggplot specify the 'aes()' option and specify country as
+# the X axis and avg_country as the Y axis. Also, don't
+# forget to 'colour' with the gender variable. Finally,
+# which plot would you like to see? geom_col()? geom_point()? Experiment
+
+Your answer
+
+# Whichever you choose, add alpha = 0.06 inside the geom_*() function
+# and add '+ coord_flip()' to make the plot horizontal and see country names
+
+# Ahh!! Looks disorganized. Try to 'reorder(country, avg_country)' in
+# the X argument from the 'aes()' option.
+
+########################################################################
 
 # Finally, let's check which countries have the biggest between school
-# variance in math test score and visualize them.
+# variance in math test score and visualize it.
 
-summary_pisa %>%
-  group_by(country, school_id) %>%
-  summarise(avg_math = mean(math_score, na.rm = T)) %>%
-  group_by(country) %>%
-  summarise(sd_country = sd(avg_math, na.rm = T))
-  
+# Let's start by piping the summary_pisa data and group by region, country and
+# school_id.
 
+Your answer
 
+# Copy that and pipe it to the summarise function. Calculate the mean
+# math_score and call that variable avg_schools. Remember to exclude missings!
+
+Your answer
+
+# Alright, now we have the mean math score for each school within each country
+# and within each region. We now want to calculate the country standard deviation
+# of these averages to estimates the between school variability in math.
+
+# How would we do this? Well, we can regroup this NEW data frame. Try
+# copying the previous expresion, piping that to 'group_by()' and group region
+# and country again. Before finishing, using the summarise function
+# create a new variable called sd_country which calculates the 'sd()'
+# of 'avg_schools'. Remember to exclude missings!
+
+Your answer
+
+########################################################################
+
+# Copy the previous expression. Let's finish by filtering out the rows
+# that have a missing in the 'region' variable. Piping the expression
+# to the filter() function, include !is.na(region) inside filter.
+
+Your answer
+
+# We have everything ready to graph!
+
+# Copy the previous expression and pipe that to ggplot(). Inside the
+# aes() option specify the X axis as: 
+# fct_reorder2(country, region, sd_country, .desc = F)
+# This simply means: reorder country by region and sd_country in ascending order
+# Specify Y to be sd_country and use the fill option with 'region'.
+# Add the geom_col() + coord_flip() to that.
+
+Your answer
+
+# That's pretty neat! Looks like Malta is extremely unequal in terms of math
+# followed by Singapore. No clear-cut relationship between regions, though.
