@@ -616,3 +616,77 @@ Benefits of this workflow:
 - Easy to read from left to right
 - No OBJECTS were created in the process
 - Allows you to think about your questions rather than on programming
+
+
+Data import with haven and readr
+============================================================
+
+```{r, eval = F}
+library(readr)
+library(haven)
+library(readxl)
+
+read_csv() # CSV, comma delimited
+read_stata() # Stata file: supports versions 8-14.
+read_spss() # SPSS (.sav) files
+read_sas() # SAS files
+read_excel() # Read .xls or .xlsx
+```
+
+Data import with haven and readr
+============================================================
+
+- Package DBI (e.g. RMySQL, RSQLite, RPostgreSQL etc) allows you to run SQL queries against a database and return a data frame.
+
+- For hierarchical data: use `jsonlite` (by Jeroen Ooms) for json, and `xml2` for XML. Jenny Bryan has some excellent worked examples at https://jennybc.github.io/purrr-tutorial/examples.html.
+
+Data import with haven and readr
+============================================================
+
+```{r}
+library(readr)
+dir_link <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/police-killings/police_killings.csv"
+
+police_killings <- read_csv(dir_link)
+```
+
+Let's put everything together
+============================================================
+
+```{r, eval = F}
+library(tidyverse)
+library(readr)
+
+dir_link <- "https://raw.githubusercontent.com/fivethirtyeight/data/master/police-killings/police_killings.csv"
+
+police_killings <- read_csv(dir_link)
+
+police_killings %>%
+  rename(ethnicity = raceethnicity) %>%
+  filter(gender == "Male") %>%
+  group_by(state) %>%
+  summarise(avg_white = mean(ethnicity == "White", na.rm = T),
+            avg_black = mean(ethnicity == "Black", na.rm = T)) %>%
+  arrange(avg_black) %>%
+  ggplot() +
+  geom_col(aes(state, avg_black), fill = "blue", alpha = 0.3) +
+  geom_col(aes(state, avg_white), fill = "red", alpha = 0.3) +
+  coord_flip()
+```
+
+Rstudio workflow
+============================================================
+
+Yes, HOMEWORK:
+http://r4ds.had.co.nz/workflow-projects.html
+
+============================================================
+
+# Thanks!
+## cimentadaj@gmail.com
+- If you want to be in our mailing list
+- Also, send feedback or want to propose a lecture/seminar
+
+<div align="center">
+<img src="./figures/tidyverse_pkg_stickers.png" width=800 height=530>
+</div>
