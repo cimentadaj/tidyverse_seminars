@@ -426,5 +426,305 @@ To learn ggplot2:
 [ggplot2 book by its author](http://ggplot2.org/book/)  
 [R for Data Science](http://r4ds.had.co.nz/)  
 
+* But also wait for the third seminar given by Robert ;)
+
+The pipe
+========================================================
+
+This is the pipe: %>%
+
+* PICTURE OF THE PIPE
+
+The pipe
+========================================================
+This a typical data manipulation workflow in R
 
 
+```r
+police_killings$year_born <- police_killings$year - police_killings$age
+
+police_killings <- police_killings[police_killings$raceethnicity == "White", ]
+
+with(police_killings, aggregate(age ~ gender, FUN = mean, na.rm = T))
+```
+
+```
+  gender      age
+1 Female 37.72727
+2   Male 40.62946
+```
+
+
+The pipe
+========================================================
+
+
+```r
+data("police_killings")
+
+police_killings %>%
+  mutate(year_born = year - age) %>%
+  filter(raceethnicity == "White") %>%
+  summarise(mean = mean(age, na.rm = T))
+```
+
+```
+# A tibble: 1 × 1
+      mean
+     <dbl>
+1 40.49362
+```
+
+The pipe
+========================================================
+
+Base R:
+
+
+```r
+police_killings$year_born <- police_killings$year - police_killings$age
+police_killings <- police_killings[police_killings$raceethnicity == "White", ]
+with(police_killings, aggregate(age ~ gender, FUN = mean, na.rm = T))
+```
+
+dplyr:
+
+
+```r
+police_killings %>%
+  mutate(year_born = year - age) %>%
+  filter(raceethnicity == "White") %>%
+  summarise(mean = mean(age, na.rm = T))
+```
+
+The pipe
+============================================================
+
+* x %>% f is equivalent to f(x)
+
+* The pipe carries the previous result into the next function
+
+* Best thing: you didn't have to create an object
+
+* This mantains a logical and clean workflow
+
+Data transformation with dplyr
+============================================================
+
+dplyr contains 'verbs' which makes the data manipulation very intuitive.
+
+These are:
+
+* `mutate()`
+* `select()`
+* `filter()`
+* `arrange()`
+* `group_by()`
+* `summarise()`
+* `rename()`
+
+Data transformation with dplyr
+============================================================
+
+They are so intuitive that even reading them can tell you what they do:
+
+
+```r
+police_killings %>%
+  rename(ethnicity = raceethnicity) %>%
+  select(gender, age, year, ethnicity, city) %>%
+  mutate(year_born = age - year) %>%
+  group_by(gender, ethnicity) %>%
+  filter(gender == "Male") %>%
+  summarise(average_age = mean(age, na.rm = T)) %>%
+  arrange(average_age)
+```
+
+```
+Source: local data frame [6 x 3]
+Groups: gender [1]
+
+  gender              ethnicity average_age
+   <chr>                  <chr>       <dbl>
+1   Male        Native American    27.75000
+2   Male        Hispanic/Latino    31.81538
+3   Male                  Black    34.16406
+4   Male Asian/Pacific Islander    38.22222
+5   Male                  White    40.62946
+6   Male                   <NA>    46.41667
+```
+
+Can you tell what I'm doing?
+
+Data transformation with dplyr
+============================================================
+
+Verb structure:
+
+
+```r
+select(.data, variable_name, variable_name)
+
+mutate(.data, new_name = contents, other_new_var = contents)
+
+group_by(.data, variable_name, variable_name)
+
+filter(.data, logical_statement, other_logical_statemente)
+
+summarise(.data, new_var = contents, new_var = contets)
+
+arrange(.data, var_to_sort_by, var_to_sort_by)
+```
+
+
+============================================================
+
+# All of these functions accept and return a data frame!
+
+Data transformation with dplyr
+============================================================
+
+Let's construct an expression ourselves.
+
+First, let's pipe the data frame `police_killings` and change the name of `raceethnicity` to `ethnicity` using the `rename()` verb. Remember, the new variable name comes before the `=` and the old variable name comes after the `=`.
+
+Data transformation with dplyr
+============================================================
+
+
+```r
+police_killings %>%
+  rename(ethnicity = raceethnicity)
+```
+
+## What do we get back?
+
+Extend the pipeline to `filter()` only `Male` from the variable `gender` ( Hint = `gender == "Male"`). After that, pipe the call to `group_by()` the state.
+
+Data transformation with dplyr
+============================================================
+
+
+```r
+police_killings %>%
+  rename(ethnicity = raceethnicity) %>%
+  filter(gender == "Male") %>%
+  group_by(state)
+```
+
+## What do we get back?
+
+- Extend the pipeline by using the `summarise()` function and create the new variable `avg_black` and `avg_white` which calculates the proportion of black and white deaths for each state.
+
+### I know this one might be hard but at least reason about it!
+
+Data transformation with dplyr
+============================================================
+
+
+```r
+police_killings %>%
+  rename(ethnicity = raceethnicity) %>%
+  filter(gender == "Male") %>%
+  group_by(state) %>%
+  summarise(avg_white = mean(ethnicity == "White", na.rm = T),
+            avg_black = mean(ethnicity == "Black", na.rm = T))
+```
+
+## What do we get back?
+
+- Finally, `arrange()` the new data set by the `avg_black()` variable
+
+Data transformation with dplyr
+============================================================
+
+
+```r
+police_killings %>%
+  rename(ethnicity = raceethnicity) %>%
+  filter(gender == "Male") %>%
+  group_by(state) %>%
+  summarise(avg_white = mean(ethnicity == "White", na.rm = T),
+            avg_black = mean(ethnicity == "Black", na.rm = T)) %>%
+  arrange(avg_black)
+```
+
+## What do we get back?
+
+Data transformation with dplyr
+============================================================
+
+
+```
+# A tibble: 46 × 3
+   state avg_white avg_black
+   <chr>     <dbl>     <dbl>
+1     AK       0.0         0
+2     CT       1.0         0
+3     DE       1.0         0
+4     HI       0.5         0
+5     IA       1.0         0
+6     ID       1.0         0
+7     KS       0.6         0
+8     ME       1.0         0
+9     MS       1.0         0
+10    MT       1.0         0
+# ... with 36 more rows
+```
+
+Data transformation with dplyr
+============================================================
+
+Here's when the strength of the `tidyverse` becomes obvious. We've used the `dplyr` tools to create a summarised dataset. This dataset is informative but we need to visualize it.
+
+## Can you think how we can connect the dplyr tools with the ggplot tools?
+
+Data transformation with dplyr
+============================================================
+
+This is one way of plotting the previous data.
+
+```r
+ggplot(summary_police) +
+  geom_col(aes(state, avg_black), fill = "blue", alpha = 0.3) +
+  geom_col(aes(state, avg_white), fill = "red", alpha = 0.3) +
+  coord_flip()
+```
+
+We specify the `data` name and we'll add two layers of bar graphs, one showing the proportion of black deaths and the other the proportion of white deaths for each state. Because both barplots will overlap, we add a certain degree of transparency so we can spot differences.
+
+Data transformation with dplyr
+============================================================
+
+![plot of chunk unnamed-chunk-31](first_seminar-figure/unnamed-chunk-31-1.png)
+
+Data transformation with dplyr
+============================================================
+
+How do we connect both expressions?
+
+## The PIPE at the rescue
+
+Data transformation with dplyr
+============================================================
+
+
+```r
+police_killings %>%
+  rename(ethnicity = raceethnicity) %>%
+  filter(gender == "Male") %>%
+  group_by(state) %>%
+  summarise(avg_white = mean(ethnicity == "White", na.rm = T),
+            avg_black = mean(ethnicity == "Black", na.rm = T)) %>%
+  arrange(avg_black) %>%
+  ggplot() +
+  geom_col(aes(state, avg_black), fill = "blue", alpha = 0.3) +
+  geom_col(aes(state, avg_white), fill = "red", alpha = 0.3) +
+  coord_flip()
+```
+
+Benefits of this workflow:
+- Intuitive verb names
+- Easy to read from left to right
+- No OBJECTS were created in the process
+- Allows you to think about your questions rather than on programming
