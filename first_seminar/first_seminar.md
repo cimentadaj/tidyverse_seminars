@@ -7,7 +7,7 @@ font-family: 'Helvetica'
 width: 1800
 height: 900
 
-The philosophy of the tidyverse
+The philosophy of the tidyverse 
 ========================================================
 incremental: true
 
@@ -437,7 +437,7 @@ This is the pipe: %>%
 
 The pipe
 ========================================================
-This a typical data manipulation workflow in R
+This is a typical data manipulation workflow in R:
 
 
 ```r
@@ -508,10 +508,21 @@ The pipe
 
 * This mantains a logical and clean workflow
 
+
+============================================================
+
+# Data transformation with dplyr
+
+
 Data transformation with dplyr
 ============================================================
 
-dplyr contains 'verbs' which makes the data manipulation very intuitive.
+`dplyr` is a package to do data manipulation or data wrangling.
+
+Data transformation with dplyr
+============================================================
+
+dplyr contains 'verbs' which makes data manipulation very intuitive.
 
 These are:
 
@@ -599,7 +610,7 @@ police_killings %>%
 
 ## What do we get back?
 
-Extend the pipeline to `filter()` only `Male` from the variable `gender` ( Hint = `gender == "Male"`). After that, pipe the call to `group_by()` the state.
+Extend the pipeline to `filter()` only `Male` from the variable `gender` ( Hint: `gender should equal "Male"`). After that, pipe the call to `group_by()` the state.
 
 Data transformation with dplyr
 ============================================================
