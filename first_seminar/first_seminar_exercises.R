@@ -146,10 +146,11 @@ Your answer
 Your answer
 
 # Whichever you choose, add alpha = 0.06 inside the geom_*() function
-# and add '+ coord_flip()' to make the plot horizontal and see country names
+# and add '+ coord_flip()' outside the geom_*() function
+# to make the plot horizontal and see the country names.
 
-# Ahh!! Looks disorganized. Try to 'reorder(country, avg_country)' in
-# the X argument from the 'aes()' option.
+# Ahh!! Looks disorganized. Try to 'reorder()' the country variable by
+# the avg_country variable in the X argument from the 'aes()' option.
 
 ########################################################################
 
