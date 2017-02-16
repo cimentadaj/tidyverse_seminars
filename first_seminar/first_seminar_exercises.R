@@ -3,7 +3,7 @@
 # Session: First tidyverse seminars
 
 # Briefly, let's recap the main tools you'll use.
-install.packages("car")
+install.packages("car", dependencies = T)
 
 # Packages:
 library(readr) # Reading csv
