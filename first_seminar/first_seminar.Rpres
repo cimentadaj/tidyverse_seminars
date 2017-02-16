@@ -352,9 +352,11 @@ To learn ggplot2:
 The pipe
 ========================================================
 
-This is the pipe: %>%
+This is the pipe:
 
-* PICTURE OF THE PIPE
+<div align="center">
+<img src="./figures/pipe.png" width=800 height=530>
+</div>
 
 The pipe
 ========================================================
@@ -378,6 +380,7 @@ data("police_killings")
 police_killings %>%
   mutate(year_born = year - age) %>%
   filter(raceethnicity == "White") %>%
+  group_by(gender) %>%
   summarise(mean = mean(age, na.rm = T))
 ```
 
@@ -398,6 +401,7 @@ dplyr:
 police_killings %>%
   mutate(year_born = year - age) %>%
   filter(raceethnicity == "White") %>%
+  group_by(gender) %>%
   summarise(mean = mean(age, na.rm = T))
 ```
 
