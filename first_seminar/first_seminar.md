@@ -439,7 +439,7 @@ This is the pipe:
 
 The pipe
 ========================================================
-This is a typical data manipulation workflow in R:
+This is a typical data manipulation workflow in R: 
 
 
 ```r

@@ -360,7 +360,7 @@ This is the pipe:
 
 The pipe
 ========================================================
-This is a typical data manipulation workflow in R:
+This is a typical data manipulation workflow in R: 
 
 ```{r}
 police_killings$year_born <- police_killings$year - police_killings$age
