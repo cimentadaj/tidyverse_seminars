@@ -10,8 +10,8 @@ height: 900
 What will we cover?
 ========================================================
 
-- Tibbles, a re-imagined data frame.
--`tidyr`, a package for tidying your data.
+- Tibbles, a re-imagined data frame.  
+- `tidyr`, a package for tidying your data.  
 - `dplyr` in more detail, to make transformation easier.
 
 Tibbles and data frames
@@ -45,7 +45,7 @@ Tibbles and data frames
 
 Tibbles are exactly as data frames with a few tweaks. Let's visit each difference separately.
 
-1st. Printing
+- 1st. Printing
 
 ```r
 library(tidyverse)
@@ -101,6 +101,10 @@ pisa
 #   ST034Q02TA <dbl>, ST034Q03TA <dbl>, ST034Q04TA <dbl>,
 #   ST034Q05TA <dbl>, ST034Q06TA <dbl>, ...
 ```
+
+Tibbles and data frames
+========================================================
+What do we get?
 
 - Data frame's dimension.
 - Column classes
@@ -1039,7 +1043,7 @@ $ VER_DAT       <fctr> 15NOV16:11:44:01, 17NOV16:11:43:00, 14NOV16:17:...
 
 Tibbles and data frames
 ========================================================
-2nd difference: Strings as factors
+- 2nd difference: Strings as factors
 
 By default, whenever R reads a data frame it turns EVERY character vector into a factor.
 
@@ -1079,7 +1083,8 @@ pisa[, "CNTRYID"] # Gives a data frame
 
 
 ```r
-pisa_2015[, "CNTRYID", drop = F] # Gives a vector
+pisa_2015[, "CNTRYID", drop = F] # Gives a data frame
+# drop .. data frame == F
 ```
 
 Bottomline: Tibbles are always tibbles unless you subset through the `$` sign.
@@ -1132,39 +1137,35 @@ What is a tidy dataset? tidyr
 
 What ISN'T a tidy dataset?
 
-
-```r
-pisa %>%
-  select(CNTSTUID, starts_with("ST098Q0"))
-```
-
-```
-# A tibble: 10,000 × 9
-   CNTSTUID ST098Q01TA ST098Q02TA ST098Q03NA ST098Q05TA ST098Q06TA
-      <dbl>      <dbl>      <dbl>      <dbl>      <dbl>      <dbl>
-1  78001092          1          4          4          4          3
-2  78412661          1          2          2          2          3
-3  44201761         NA         NA         NA         NA         NA
-4  79201420          1          1          1          1          3
-5  42802282          1          3          2          3          1
-6   7622701          1          4          2          4          2
-7  24604748          3          3          4          3          3
-8  78801159          2         NA          3          3          2
-9  64304364          2          3          2          3          2
-10 20302661          2          4          4          4          2
-# ... with 9,990 more rows, and 3 more variables: ST098Q07TA <dbl>,
-#   ST098Q08NA <dbl>, ST098Q09TA <dbl>
-```
-
 ST098Q01TA - ST098Q09TA:
-- When learning <school science>?
+- When learning school science?
  - The teacher clearly explains the class
  - Students spend time in the laboratory
  - etc..
+
+
+```
+# A tibble: 2 × 9
+  CNTSTUID ST098Q01TA ST098Q02TA ST098Q03NA ST098Q05TA ST098Q06TA
+     <dbl>      <dbl>      <dbl>      <dbl>      <dbl>      <dbl>
+1 78001092          1          4          4          4          3
+2 78412661          1          2          2          2          3
+# ... with 3 more variables: ST098Q07TA <dbl>, ST098Q08NA <dbl>,
+#   ST098Q09TA <dbl>
+```
  
 All columns are actually ONE variable.
 
 This is a case where: Column headers are values, not variable names.
+
+What is a tidy dataset? tidyr
+========================================================
+
+<div align="left">
+<img src="./figures/gather.png" width=1200 height=500>
+</div>
+
+[http://r4ds.had.co.nz/tidy-data.html](http://r4ds.had.co.nz/tidy-data.html)
 
 What is a tidy dataset? tidyr
 ========================================================
@@ -1220,49 +1221,41 @@ pisa %>%
   select(CNT, school_science, answers)
 ```
 
-We can regular expressions to search for names as in the previous `gather` call.
+We can use regular expressions to search for names as in the previous `gather` call.
 
 What is a tidy dataset? tidyr
 ========================================================
-
-Other messy data problem:
 
 How do we fix a case of: Multiple variables stored in one column
 
 
 ```r
 who %>%
-  select(country, year, starts_with("new_sp_"))
+  select(country, year, starts_with("new_sp_")) %>%
+  head(3)
 ```
 
 ```
-# A tibble: 7,240 × 16
-       country  year new_sp_m014 new_sp_m1524 new_sp_m2534 new_sp_m3544
-         <chr> <int>       <int>        <int>        <int>        <int>
-1  Afghanistan  1980          NA           NA           NA           NA
-2  Afghanistan  1981          NA           NA           NA           NA
-3  Afghanistan  1982          NA           NA           NA           NA
-4  Afghanistan  1983          NA           NA           NA           NA
-5  Afghanistan  1984          NA           NA           NA           NA
-6  Afghanistan  1985          NA           NA           NA           NA
-7  Afghanistan  1986          NA           NA           NA           NA
-8  Afghanistan  1987          NA           NA           NA           NA
-9  Afghanistan  1988          NA           NA           NA           NA
-10 Afghanistan  1989          NA           NA           NA           NA
-# ... with 7,230 more rows, and 10 more variables: new_sp_m4554 <int>,
-#   new_sp_m5564 <int>, new_sp_m65 <int>, new_sp_f014 <int>,
-#   new_sp_f1524 <int>, new_sp_f2534 <int>, new_sp_f3544 <int>,
-#   new_sp_f4554 <int>, new_sp_f5564 <int>, new_sp_f65 <int>
+# A tibble: 3 × 16
+      country  year new_sp_m014 new_sp_m1524 new_sp_m2534 new_sp_m3544
+        <chr> <int>       <int>        <int>        <int>        <int>
+1 Afghanistan  1980          NA           NA           NA           NA
+2 Afghanistan  1981          NA           NA           NA           NA
+3 Afghanistan  1982          NA           NA           NA           NA
+# ... with 10 more variables: new_sp_m4554 <int>, new_sp_m5564 <int>,
+#   new_sp_m65 <int>, new_sp_f014 <int>, new_sp_f1524 <int>,
+#   new_sp_f2534 <int>, new_sp_f3544 <int>, new_sp_f4554 <int>,
+#   new_sp_f5564 <int>, new_sp_f65 <int>
 ```
 
-Ignore the `new_sp_`. the `m` stands for `Male` and `014` the age range `0-14`. The same logic applies for all other columns but for females.
+Ignore the `new_sp_` part of the column names. The `m` stands for `Male` and `014` the age range `0-14`. The same logic applies for all other columns but for females.
 
 How do we handle this?
 
 What is a tidy dataset? tidyr
 ========================================================
 
-We use `separate()`. `separate()` spreads one column across several columns.
+We use `separate()`. `separate()` spreads one column into several columns.
 
 More concretely, we start by tidying the data:
 
@@ -1272,14 +1265,9 @@ tidy_dat <-
   select(country, year, starts_with("new_sp_")) %>%
   gather(age, value, -country, -year)
 ```
+
 Then we spread the column into two:
 
-
-```r
-tidy_dat %>%
-  mutate(age = gsub("new_sp_", "", age)) %>%
-  separate(age, c("gender", "age"), sep = 1)
-```
 
 ```
 # A tibble: 101,360 × 5
@@ -1297,6 +1285,8 @@ tidy_dat %>%
 10 Afghanistan  1989      m   014    NA
 # ... with 101,350 more rows
 ```
+
+What do you think the result will be? Try it out yourself.
 
 What is a tidy dataset? tidyr
 ========================================================
@@ -1328,18 +1318,202 @@ What is a tidy dataset? tidyr
 
 Finally, the last important verb from tidyr is `spread()`. `spread()` behaves exactly the opposite as gather. It turns stacked columns into wide columns.
 
-But wait, why should we `spread` the data when we've been discussing why you should `gather` it?
+But wait, why should we `spread` the data when we've been discussing why you should `gather` it, i.e tidy data?
 
-Wide data is also widely used for specific analysis, such as longitudinal modelling, matrix multiplication, among other things. Aside from these scenarios you will encounter many situations where `spread` is needed.
+Wide data is also widely used for specific analysis: 
+- longitudinal modelling
+- matrix multiplication
+
+Aside from these scenarios you will encounter many situations where `spread` is needed.
+
+What is a tidy dataset? tidyr
+========================================================
+When will you use `spread`?
+
+
+```r
+pisa %>%
+  rename(country = CNT,
+         math_score = PV1MATH,
+         gender = ST004D01T) %>%
+  group_by(country, gender) %>%
+  summarise(avg_math = mean(math_score, na.rm = T)) %>%
+  head(5)
+```
+
+```
+Source: local data frame [5 x 3]
+Groups: country [3]
+
+                                country gender avg_math
+                                 <fctr>  <int>    <dbl>
+1                               Albania      1 401.9376
+2                               Albania      2 415.5266
+3                               Algeria      1 371.3235
+4                               Algeria      2 348.1560
+5 Argentina (Ciudad Autónoma de Buenos)      1 421.2569
+```
+
+How would you calculate the difference between males and females for each country?
 
 What is a tidy dataset? tidyr
 ========================================================
 
 
+```r
+pisa %>%
+  rename(country = CNT,
+         math_score = PV1MATH,
+         gender = ST004D01T) %>%
+  group_by(country, gender) %>%
+  summarise(avg_math = mean(math_score, na.rm = T)) %>%
+  spread(gender, avg_math) %>%
+  mutate(diff = `2` - `1`) %>%
+  head(4)
+```
 
 ```
-Error in parse(text = x, srcfile = src) : 
-  <text>:3:0: unexpected end of input
-2: xplain how to use spread. Specifically for column operations, like differences between two categories and the come back to the tidy dataset. Think of any other column operation that might be i
-   ^
+Source: local data frame [4 x 4]
+Groups: country [4]
+
+                                country      `1`      `2`      diff
+                                 <fctr>    <dbl>    <dbl>     <dbl>
+1                               Albania 401.9376 415.5266  13.58900
+2                               Algeria 371.3235 348.1560 -23.16750
+3 Argentina (Ciudad Autónoma de Buenos) 421.2569 505.4729  84.21595
+4                             Australia 478.7410 494.9821  16.24104
 ```
+
+What is a tidy dataset? tidyr
+========================================================
+At this point you could re-`gather` the previous result.
+
+Try doing it yourself!
+
+Gather the previous result so that there's a column named `categories` which has the categories `1`, `2` and `diff` and a `value` column containing the scores for each category.
+
+
+What is a tidy dataset? tidyr
+========================================================
+
+```r
+pisa %>%
+  rename(country = CNT,
+         math_score = PV1MATH,
+         gender = ST004D01T) %>%
+  group_by(country, gender) %>%
+  summarise(avg_math = mean(math_score, na.rm = T)) %>%
+  spread(gender, avg_math) %>%
+  mutate(diff = `2` - `1`) %>%
+  gather(categories, value, -country) %>%
+  arrange(country, categories) %>% # This part is optional
+  head(6)
+```
+
+```
+Source: local data frame [6 x 3]
+Groups: country [2]
+
+  country categories    value
+   <fctr>      <chr>    <dbl>
+1 Albania          1 401.9376
+2 Albania          2 415.5266
+3 Albania       diff  13.5890
+4 Algeria          1 371.3235
+5 Algeria          2 348.1560
+6 Algeria       diff -23.1675
+```
+
+What is a tidy dataset? tidyr
+========================================================
+
+<div align="left">
+<img src="./figures/spread.png" width=1200 height=500>
+</div>
+
+[http://r4ds.had.co.nz/tidy-data.html](http://r4ds.had.co.nz/tidy-data.html)
+
+What is a tidy dataset? tidyr
+========================================================
+
+
+```r
+people <- tribble(
+  ~name,             ~key,    ~value,
+  #-----------------|--------|------
+  "Phillip Woods",   "age",       45,
+  "Phillip Woods",   "height",   186,
+  "Phillip Woods",   "age",       50,
+  "Jessica Cordero", "age",       37,
+  "Jessica Cordero", "height",   156
+)
+
+# spread(people, key, value)
+```
+
+Why does this fail?
+
+What is a tidy dataset? tidyr
+========================================================
+
+Possible solutions:
+
+* This might be a typo because Phillip Woods has `two` ages.
+* If for some reason you don't want to delete that row, then you can fix it by adding a column that uniquely identifies each user.
+
+
+```r
+people %>%
+  mutate(id = c(1, 1, 2, 3, 3)) %>%
+  spread(key, value)
+```
+
+```
+# A tibble: 3 × 4
+             name    id   age height
+*           <chr> <dbl> <dbl>  <dbl>
+1 Jessica Cordero     3    37    156
+2   Phillip Woods     1    45    186
+3   Phillip Woods     2    50     NA
+```
+
+What is a tidy dataset? tidyr
+========================================================
+
+Let's do an exercise. I give you this tibble:
+
+```r
+preg <- tribble(
+  ~pregnant, ~male, ~female,
+  "yes",     NA,    10,
+  "no",      20,    12
+)
+
+preg
+```
+
+```
+# A tibble: 2 × 3
+  pregnant  male female
+     <chr> <dbl>  <dbl>
+1      yes    NA     10
+2       no    20     12
+```
+
+What is a tidy dataset? tidyr
+========================================================
+
+Can you turn that into:
+
+
+```r
+# A tibble: 4 × 3
+  gender pregnant  freq
+   <chr>    <chr> <dbl>
+1 female       no    12
+2   male       no    20
+3 female      yes    10
+4   male      yes    NA
+```
+
+Hint: You'll need to use `gather`, `spread` and then `gather`.
