@@ -1447,11 +1447,14 @@ people <- tribble(
   "Jessica Cordero", "age",       37,
   "Jessica Cordero", "height",   156
 )
-
-# spread(people, key, value)
 ```
 
-Why does this fail?
+```r
+people %>%
+  spread(key, value)
+```
+
+Run it and why does this fail?
 
 What is a tidy dataset? tidyr
 ========================================================
@@ -1517,3 +1520,201 @@ Can you turn that into:
 ```
 
 Hint: You'll need to use `gather`, `spread` and then `gather`.
+
+What is a tidy dataset? tidyr
+========================================================
+
+We start off by gathering the `male` and `female` columns into a gender column and the values in a column called `freq`
+
+
+```r
+preg %>%
+  gather(gender, freq, -pregnant)
+```
+
+```
+# A tibble: 4 × 3
+  pregnant gender  freq
+     <chr>  <chr> <dbl>
+1      yes   male    NA
+2       no   male    20
+3      yes female    10
+4       no female    12
+```
+
+So we have the correct result but the order is still different. We need to `spread` the pregnant variable and then `gather` it again.
+
+What is a tidy dataset? tidyr
+========================================================
+
+
+```r
+preg %>%
+  gather(gender, freq, -pregnant) %>%
+  spread(pregnant, freq)
+```
+
+```
+# A tibble: 2 × 3
+  gender    no   yes
+*  <chr> <dbl> <dbl>
+1 female    12    10
+2   male    20    NA
+```
+
+So far so good, now we have a data frame which is excatly the opposite as the first one. In fact, it is exactly the same tibble but transposed, i.e. the rows are column and the columns rows.
+
+What is a tidy dataset? tidyr
+========================================================
+
+```r
+preg %>%
+  gather(gender, freq, -pregnant) %>%
+  spread(pregnant, freq) %>%
+  gather(pregnant, freq)
+```
+
+```
+# A tibble: 6 × 2
+  pregnant   freq
+     <chr>  <chr>
+1   gender female
+2   gender   male
+3       no     12
+4       no     20
+5      yes     10
+6      yes   <NA>
+```
+
+Ups, what's wrong?
+
+What is a tidy dataset? tidyr
+========================================================
+Remember that gathering is applied to all columns by default. You have to specify which columns you want to be stacked. In our example, we need to exclude the gender column
+
+
+```r
+preg %>%
+  gather(gender, freq, -pregnant) %>%
+  spread(pregnant, freq) %>%
+  gather(pregnant, freq, -gender)
+```
+
+```
+# A tibble: 4 × 3
+  gender pregnant  freq
+   <chr>    <chr> <dbl>
+1 female       no    12
+2   male       no    20
+3 female      yes    10
+4   male      yes    NA
+```
+
+What is a tidy dataset? tidyr
+========================================================
+Finally, let's introduce `unite` which is the exact opposite of `separate`.
+
+If you remember correctly, `separate` allowed you to separate one column into several columns by specifying either:
+
+- a regular expression
+- the index in which the separation needs to take place.
+
+`unite` takes several columns and unites them into one.
+
+What is a tidy dataset? tidyr
+========================================================
+
+A not-so clear example.
+
+There's two columns that specify the `CNTRYID` and the `CNTSCHID` (Country School ID) in the PISA dataset. There's also another column named `BOOKID` which specifies the `BOOK` the used to answer the survey. Let's paste them all together with `unite`!
+
+
+```r
+pisa %>%
+  unite(overall_id, CNTRYID, CNTSCHID, BOOKID) %>%
+  head(5)
+```
+
+
+What is a tidy dataset? tidyr
+========================================================
+
+Pretty neat? We can also change the separator with the sep argument.
+
+
+```r
+pisa %>%
+  unite(overall_id, CNTRYID, CNTSCHID, BOOKID, sep = "") %>%
+  head(5)
+```
+
+```
+# A tibble: 5 × 919
+     overall_id                  CNT CNTSTUID    CYC NatCen   Region
+          <chr>               <fctr>    <dbl> <fctr>  <int>   <fctr>
+1 7807800002221  Trinidad and Tobago 78001092   06MS  78000 Americas
+2 7847840039334 United Arab Emirates 78412661   06MS  78400     Asia
+3 4424420001651           Luxembourg 44201761   06MS  44200   Europe
+4 7927920001933               Turkey 79201420   06MS  79200     Asia
+5 4284280013444               Latvia 42802282   06MS  42800   Europe
+# ... with 913 more variables: STRATUM <fctr>, SUBNATIO <int>, OECD <int>,
+#   ADMINMODE <int>, Option_CPS <int>, Option_FL <int>, Option_ICTQ <int>,
+#   Option_ECQ <int>, Option_PQ <int>, Option_TQ <int>, Option_UH <int>,
+#   Option_Read <fctr>, Option_Math <fctr>, LANGTEST_QQQ <dbl>,
+#   LANGTEST_COG <int>, LANGTEST_PAQ <dbl>, CBASCI <dbl>, ST001D01T <int>,
+#   ST003D02T <int>, ST003D03T <int>, ST004D01T <int>, ST005Q01TA <dbl>,
+#   ST006Q01TA <dbl>, ST006Q02TA <dbl>, ST006Q03TA <dbl>,
+#   ST006Q04TA <dbl>, ST007Q01TA <dbl>, ST008Q01TA <dbl>,
+#   ST008Q02TA <dbl>, ST008Q03TA <dbl>, ST008Q04TA <dbl>,
+#   ST011Q01TA <dbl>, ST011Q02TA <dbl>, ST011Q03TA <dbl>,
+#   ST011Q04TA <dbl>, ST011Q05TA <dbl>, ST011Q06TA <dbl>,
+#   ST011Q07TA <dbl>, ST011Q08TA <dbl>, ST011Q09TA <dbl>,
+#   ST011Q10TA <dbl>, ST011Q11TA <dbl>, ST011Q12TA <dbl>,
+#   ST011Q16NA <dbl>, ST011D17TA <fctr>, ST011D18TA <fctr>,
+#   ST011D19TA <fctr>, ST012Q01TA <dbl>, ST012Q02TA <dbl>,
+#   ST012Q03TA <dbl>, ST012Q05NA <dbl>, ST012Q06NA <dbl>,
+#   ST012Q07NA <dbl>, ST012Q08NA <dbl>, ST012Q09NA <dbl>,
+#   ST013Q01TA <dbl>, ST123Q01NA <dbl>, ST123Q02NA <dbl>,
+#   ST123Q03NA <dbl>, ST123Q04NA <dbl>, ST019AQ01T <dbl>,
+#   ST019BQ01T <dbl>, ST019CQ01T <dbl>, ST021Q01TA <dbl>,
+#   ST022Q01TA <dbl>, ST124Q01TA <dbl>, ST125Q01NA <dbl>,
+#   ST126Q01TA <dbl>, ST127Q01TA <dbl>, ST127Q02TA <dbl>,
+#   ST127Q03TA <dbl>, ST111Q01TA <dbl>, ST118Q01NA <dbl>,
+#   ST118Q02NA <dbl>, ST118Q03NA <dbl>, ST118Q04NA <dbl>,
+#   ST118Q05NA <dbl>, ST119Q01NA <dbl>, ST119Q02NA <dbl>,
+#   ST119Q03NA <dbl>, ST119Q04NA <dbl>, ST119Q05NA <dbl>,
+#   ST121Q01NA <dbl>, ST121Q02NA <dbl>, ST121Q03NA <dbl>,
+#   ST082Q01NA <dbl>, ST082Q02NA <dbl>, ST082Q03NA <dbl>,
+#   ST082Q08NA <dbl>, ST082Q09NA <dbl>, ST082Q12NA <dbl>,
+#   ST082Q13NA <dbl>, ST082Q14NA <dbl>, ST034Q01TA <dbl>,
+#   ST034Q02TA <dbl>, ST034Q03TA <dbl>, ST034Q04TA <dbl>,
+#   ST034Q05TA <dbl>, ST034Q06TA <dbl>, ST039Q01NA <dbl>, ...
+```
+
+
+Why is R so difficult at data cleaning?
+========================================================
+
+It's difficult if you're not familiar with most base R functions.
+
+As mentioned before, most data cleaning skills require intimate knowledge with:
+- Vectorized operations
+- For loops
+- [The apply family](https://www.datacamp.com/community/tutorials/r-tutorial-apply-family#gs.4lcAXts)
+- [Common base R functions](http://adv-r.had.co.nz/Vocabulary.html)
+
+Most of this knowledge comes together with time and practice. The benefit of the tidyverse is the fast adoption of the syntax and the simplification of many common tasks.
+
+Why is R so difficult at data cleaning?
+========================================================
+
+This doesn't mean you don't need to learn vectorized operations, common base R functions or for loops. These are important and defining components of a rich data analysis vocabulary.
+
+In order to be a proficient data analysis you will eventually have to leave the `tidyverse`.
+
+More importantly, in order to create useful tools and insightful analysis you'll need to use `non-tidyverse` tools.
+
+dplyr and relational databases
+========================================================
+
+

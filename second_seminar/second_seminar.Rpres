@@ -340,11 +340,13 @@ people <- tribble(
   "Jessica Cordero", "age",       37,
   "Jessica Cordero", "height",   156
 )
-
-# spread(people, key, value)
+```
+```{r, eval = F}
+people %>%
+  spread(key, value)
 ```
 
-Why does this fail?
+Run it and why does this fail?
 
 What is a tidy dataset? tidyr
 ========================================================
@@ -390,3 +392,114 @@ Can you turn that into:
 ```
 
 Hint: You'll need to use `gather`, `spread` and then `gather`.
+
+What is a tidy dataset? tidyr
+========================================================
+
+We start off by gathering the `male` and `female` columns into a gender column and the values in a column called `freq`
+
+```{r}
+preg %>%
+  gather(gender, freq, -pregnant)
+```
+
+So we have the correct result but the order is still different. We need to `spread` the pregnant variable and then `gather` it again.
+
+What is a tidy dataset? tidyr
+========================================================
+
+```{r}
+preg %>%
+  gather(gender, freq, -pregnant) %>%
+  spread(pregnant, freq)
+```
+
+So far so good, now we have a data frame which is excatly the opposite as the first one. In fact, it is exactly the same tibble but transposed, i.e. the rows are column and the columns rows.
+
+What is a tidy dataset? tidyr
+========================================================
+```{r}
+preg %>%
+  gather(gender, freq, -pregnant) %>%
+  spread(pregnant, freq) %>%
+  gather(pregnant, freq)
+```
+
+Ups, what's wrong?
+
+What is a tidy dataset? tidyr
+========================================================
+Remember that gathering is applied to all columns by default. You have to specify which columns you want to be stacked. In our example, we need to exclude the gender column
+
+```{r}
+preg %>%
+  gather(gender, freq, -pregnant) %>%
+  spread(pregnant, freq) %>%
+  gather(pregnant, freq, -gender)
+```
+
+What is a tidy dataset? tidyr
+========================================================
+Finally, let's introduce `unite` which is the exact opposite of `separate`.
+
+If you remember correctly, `separate` allowed you to separate one column into several columns by specifying either:
+
+- a regular expression
+- the index in which the separation needs to take place.
+
+`unite` takes several columns and unites them into one.
+
+What is a tidy dataset? tidyr
+========================================================
+
+A not-so clear example.
+
+There's two columns that specify the `CNTRYID` and the `CNTSCHID` (Country School ID) in the PISA dataset. There's also another column named `BOOKID` which specifies the `BOOK` the used to answer the survey. Let's paste them all together with `unite`!
+
+```{r, eval = F}
+pisa %>%
+  unite(overall_id, CNTRYID, CNTSCHID, BOOKID) %>%
+  head(5)
+```
+
+
+What is a tidy dataset? tidyr
+========================================================
+
+Pretty neat? We can also change the separator with the sep argument.
+
+```{r}
+pisa %>%
+  unite(overall_id, CNTRYID, CNTSCHID, BOOKID, sep = "") %>%
+  head(5)
+```
+
+
+Why is R so difficult at data cleaning?
+========================================================
+
+It's difficult if you're not familiar with most base R functions.
+
+As mentioned before, most data cleaning skills require intimate knowledge with:
+- Vectorized operations
+- For loops
+- [The apply family](https://www.datacamp.com/community/tutorials/r-tutorial-apply-family#gs.4lcAXts)
+- [Common base R functions](http://adv-r.had.co.nz/Vocabulary.html)
+
+Most of this knowledge comes together with time and practice. The benefit of the tidyverse is the fast adoption of the syntax and the simplification of many common tasks.
+
+Why is R so difficult at data cleaning?
+========================================================
+
+This doesn't mean you don't need to learn vectorized operations, common base R functions or for loops. These are important and defining components of a rich data analysis vocabulary.
+
+In order to be a proficient data analysis you will eventually have to leave the `tidyverse`.
+
+More importantly, in order to create useful tools and insightful analysis you'll need to use `non-tidyverse` tools.
+
+dplyr and relational databases
+========================================================
+
+```{r}
+
+```
