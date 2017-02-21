@@ -10,7 +10,7 @@ height: 900
 What will we cover?
 ========================================================
 
-- Tibbles, a re-imagined data frame.  
+- `Tibbles`, a re-imagined data frame.  
 - `tidyr`, a package for tidying your data.  
 - `dplyr` in more detail, to make transformation easier.
 
@@ -1075,7 +1075,10 @@ Tibbles and data frames
 In short:
 
 ```r
+# Data frame
 pisa_2015[, "CNTRYID"] # Gives a vector
+
+# Tibble
 pisa[, "CNTRYID"] # Gives a data frame
 ```
 
@@ -1084,7 +1087,7 @@ pisa[, "CNTRYID"] # Gives a data frame
 
 ```r
 pisa_2015[, "CNTRYID", drop = F] # Gives a data frame
-# drop .. data frame == F
+# drop is short for drop data frame?
 ```
 
 Bottomline: Tibbles are always tibbles unless you subset through the `$` sign.
@@ -1265,9 +1268,21 @@ tidy_dat <-
   select(country, year, starts_with("new_sp_")) %>%
   gather(age, value, -country, -year)
 ```
+What do you think the result will be? Try it out yourself.
 
 Then we spread the column into two:
 
+
+```r
+tidy_dat %>%
+  mutate(age = gsub("new_sp_", "", age)) %>%
+  separate(age, c("gender", "age"), sep = 1)
+```
+
+What do you expect to see?
+
+What is a tidy dataset? tidyr
+========================================================
 
 ```
 # A tibble: 101,360 × 5
@@ -1286,8 +1301,6 @@ Then we spread the column into two:
 # ... with 101,350 more rows
 ```
 
-What do you think the result will be? Try it out yourself.
-
 What is a tidy dataset? tidyr
 ========================================================
 
@@ -1296,7 +1309,7 @@ The arguments for `separate()` in order:
 - col = bare column name that will be split
 - into = character vector containing the new column variable names
 - sep = If you know regular expressions, then a regular expression,
-        if a number, interpreted as the position where the split at.
+        if a number, interpreted as the position where to split at.
 
 `?separate` for all other arguments
 
@@ -1454,7 +1467,9 @@ people %>%
   spread(key, value)
 ```
 
-Run it and why does this fail?
+Why does this fail?
+
+Exercise taken from: http://r4ds.had.co.nz/tidy-data.html
 
 What is a tidy dataset? tidyr
 ========================================================
@@ -1542,7 +1557,7 @@ preg %>%
 4       no female    12
 ```
 
-So we have the correct result but the order is still different. We need to `spread` the pregnant variable and then `gather` it again.
+So we have the correct result but the order is still different. We need to `spread` the `pregnant` variable and then `gather` it again.
 
 What is a tidy dataset? tidyr
 ========================================================
@@ -1590,7 +1605,7 @@ Ups, what's wrong?
 
 What is a tidy dataset? tidyr
 ========================================================
-Remember that gathering is applied to all columns by default. You have to specify which columns you want to be stacked. In our example, we need to exclude the gender column
+Remember that gathering is applied to all columns by default. You have to specify which columns you want to be stacked. In our example, we need to exclude the `gender` column
 
 
 ```r
@@ -1626,7 +1641,7 @@ What is a tidy dataset? tidyr
 
 A not-so clear example.
 
-There's two columns that specify the `CNTRYID` and the `CNTSCHID` (Country School ID) in the PISA dataset. There's also another column named `BOOKID` which specifies the `BOOK` the used to answer the survey. Let's paste them all together with `unite`!
+There's two columns that specify the `CNTRYID` and the `CNTSCHID` (Country School ID) in the PISA dataset. There's also another column, `BOOKID`, which specifies the book the child used to answer the survey. Let's paste them all together with `unite`!
 
 
 ```r
@@ -1697,7 +1712,7 @@ Why is R so difficult at data cleaning?
 
 It's difficult if you're not familiar with most base R functions.
 
-As mentioned before, most data cleaning skills require intimate knowledge with:
+Most data cleaning skills require intimate knowledge with:
 - Vectorized operations
 - For loops
 - [The apply family](https://www.datacamp.com/community/tutorials/r-tutorial-apply-family#gs.4lcAXts)
@@ -1710,11 +1725,402 @@ Why is R so difficult at data cleaning?
 
 This doesn't mean you don't need to learn vectorized operations, common base R functions or for loops. These are important and defining components of a rich data analysis vocabulary.
 
-In order to be a proficient data analysis you will eventually have to leave the `tidyverse`.
-
 More importantly, in order to create useful tools and insightful analysis you'll need to use `non-tidyverse` tools.
 
 dplyr and relational databases
 ========================================================
 
+Databases we'll be using:
 
+```r
+library(readr)
+url <- "https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/first_seminar/data/"
+data <- paste0(c("pisa2015", "school", "teacher", "cognitive"), ".csv")
+links <- paste0(url, data) 
+
+student <- read_csv(links[1])
+school <- read_csv(links[2])
+teacher <- read_csv(links[3])
+cognitive <- read_csv(links[4])
+```
+
+PISA datasets for students and info on their schools', parents' and teachers'.
+
+dplyr and relational databases
+========================================================
+
+Structure of the datasets
+
+Student level data:
+- ID variables: CNTRYID, CNTSCHID, CNTSTUDID
+- Dataset: `student` and `cognitive`
+
+School level data:
+- ID variables: CNTRYID, CNTSCHID, CNTTCHID
+- Dataset: `teacher` and `school`
+
+dplyr and relational databases
+========================================================
+ 
+<div align="center">
+<img src="./figures/relational_data.png" width=700 height=750>
+</div>
+https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+
+dplyr and relational databases
+========================================================
+
+Let's start by merging the student data using `inner_join`. Why? Because the `student` and `cognitive` datasets are actually randomly sampled children to make the data smaller.
+
+We only want to retain students that appear in both data sets.
+ 
+
+```r
+student_level <-
+  student %>%
+  inner_join(cognitive, by = c("CNT", "CNTRYID", "CNTSCHID", "CNTSTUID"))
+```
+
+If both datasets were complete (as they are in their original format) then we would use `left_join`.
+
+dplyr and relational databases
+========================================================
+
+But wait. Because all datasets are random, and some students won't find a match, we want to keep all students and merge them with the school level data.
+
+We should do that and then remove all those that didn't match. How do we do that?
+
+Let's merge the `student` and `cognitive` data using the `full_join`. This retains all rows from both data sets.
+
+
+```r
+all_students <-
+  student %>%
+  full_join(cognitive, by = c("CNT", "CNTRYID", "CNTSCHID", "CNTSTUID"))
+```
+
+dplyr and relational databases
+========================================================
+
+Alright. Let's merge the `all_students` data with the `school` data. But for this merge we only want students in which there is `school` data. If we go back to the `dplyr` cheatsheet, we find `inner_join`.
+
+But this time you'll do it.
+
+- Pipe `all_students` to `inner_join` and merge with `school`.
+- As ID keys, use `CNT`, `CNTRYID` and `CNTSCHID`.
+- Finally, save the whole pipeline to an object called `student_school`.
+
+
+dplyr and relational databases
+========================================================
+Answer
+
+
+```r
+student_school <-
+  all_students %>%
+  inner_join(school, by = c("CNT", "CNTRYID", "CNTSCHID"))
+```
+
+dplyr and relational databases
+========================================================
+
+Let's do some data exploration on best and worst performers by country using `student_school`. Let's start by
+- ...piping the `student_school` data to the `group_by` function and group by the variable `CNTSCHID` and ``CNT`.
+
+- Pipe that to the `summarise` function and create a new variable called `avg_read` and get the `mean` of `PV1READ`.
+
+- Save all of that to the name `country_summary`.
+
+- Don't forget to remove `NA`'s from the `mean` function.
+
+dplyr and relational databases
+========================================================
+Answer
+
+
+```r
+(country_summary <-
+  student_school %>%
+  group_by(CNTSCHID, CNT) %>%
+  summarise(avg_read = mean(PV1READ, na.rm = T)))
+```
+
+```
+Source: local data frame [6,068 x 3]
+Groups: CNTSCHID [?]
+
+   CNTSCHID     CNT avg_read
+      <dbl>   <chr>    <dbl>
+1    800004 Albania 531.1590
+2    800007 Albania      NaN
+3    800014 Albania 335.5730
+4    800015 Albania 246.8260
+5    800027 Albania 475.3010
+6    800029 Albania      NaN
+7    800032 Albania      NaN
+8    800034 Albania 379.0535
+9    800036 Albania 388.5050
+10   800037 Albania      NaN
+# ... with 6,058 more rows
+```
+
+dplyr and relational databases
+========================================================
+
+Now, we'll introduce a function from the `base R` that was rewritten for `dplyr` called `min_rank`. It simply calculates a rank for a specific variable. We can use it to calculate the best and worst schools for each country.
+
+
+```r
+(ranked_cnt <-
+  country_summary %>%
+  group_by(CNT) %>%
+  mutate(rank = min_rank(avg_read)))
+```
+
+```
+Source: local data frame [6,068 x 4]
+Groups: CNT [70]
+
+   CNTSCHID     CNT avg_read  rank
+      <dbl>   <chr>    <dbl> <int>
+1    800004 Albania 531.1590    37
+2    800007 Albania      NaN    NA
+3    800014 Albania 335.5730     9
+4    800015 Albania 246.8260     2
+5    800027 Albania 475.3010    33
+6    800029 Albania      NaN    NA
+7    800032 Albania      NaN    NA
+8    800034 Albania 379.0535    18
+9    800036 Albania 388.5050    20
+10   800037 Albania      NaN    NA
+# ... with 6,058 more rows
+```
+
+dplyr and relational databases
+========================================================
+This was just a small example of `dplyr` and its functions.
+
+`dplyr` has a lot of 'small' functions to carry out typical operations. Look at the `window function` section from here: https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
+
+dplyr and relational databases
+========================================================
+
+Let's continue. We want to merge this `ranked_cnt` with some information from the teacher's data in order to see if top schools have better teachers than worst schools.
+
+- Pipe the `teacher` data to the `select` function and `rename` the `TC012Q01NA` variable to `teacher_edu`. Remember, the new name comes first.
+
+- Pipe that to `select` and only `select` the variables `CNTSTUID` and `teacher_edu`
+
+dplyr and relational databases
+========================================================
+Answer 
+
+
+```r
+teacher %>%
+  rename(teacher_edu = TC012Q01NA) %>%
+  select(CNTSCHID, teacher_edu)
+```
+
+```
+# A tibble: 10,000 × 2
+   CNTSCHID teacher_edu
+      <dbl>       <dbl>
+1   3600144           3
+2  78400039           3
+3  78400150         NaN
+4  38000293           3
+5  15600009           3
+6   3600224         NaN
+7   7600775           4
+8  15600054           3
+9  78400059           5
+10  3600264           3
+# ... with 9,990 more rows
+```
+
+dplyr and relational databases
+========================================================
+
+Now we need to merge this updated-teacher dataset with the student data. We can actually do it within the previous pipeline, i.e without creating anything separate.
+
+### Can you tell me which of the merge functions we need to use?
+
+- `inner_join`
+- `full_join`
+- `left_join`
+- `right_join`
+
+dplyr and relational databases
+========================================================
+
+The correct answer is `right_join`. Why? Because we want to merge the updated teacher data TO THE `ranked_cnt` and the previous pipeline the teacher data will be the first argument in the pipeline.
+
+If we were to use `left_join`, we would be merging the matching rows from `ranked_cnt` TO THE updated-teacher data.
+
+- Copy the previous pipeline and pipe that to `right_join`, specify the `ranked_cnt` data to join by and finally, use `CNTSCHID` as the key variable.
+
+dplyr and relational databases
+========================================================
+Answer
+
+
+```r
+teacher %>%
+  rename(teacher_edu = TC012Q01NA) %>%
+  select(CNTSCHID, teacher_edu) %>%
+  right_join(ranked_cnt, by = "CNTSCHID")
+```
+
+```
+# A tibble: 8,066 × 5
+   CNTSCHID teacher_edu     CNT avg_read  rank
+      <dbl>       <dbl>   <chr>    <dbl> <int>
+1    800004          NA Albania 531.1590    37
+2    800007          NA Albania      NaN    NA
+3    800014          NA Albania 335.5730     9
+4    800015          NA Albania 246.8260     2
+5    800027          NA Albania 475.3010    33
+6    800029          NA Albania      NaN    NA
+7    800032          NA Albania      NaN    NA
+8    800034          NA Albania 379.0535    18
+9    800036          NA Albania 388.5050    20
+10   800037          NA Albania      NaN    NA
+# ... with 8,056 more rows
+```
+
+
+dplyr and relational databases
+========================================================
+
+Now, we'll take the previous pipeline and  `group_by` `CNT`. We'll save the whole expression to a new object called `summary_teacher`.
+
+
+```r
+summary_teacher <-
+  teacher %>%
+  rename(teacher_edu = TC012Q01NA) %>%
+  select(CNTSCHID, teacher_edu) %>%
+  right_join(ranked_cnt, by = "CNTSCHID") %>%
+  group_by(CNT)
+```
+
+dplyr and relational databases
+========================================================
+
+Your turn:
+
+- Pipe the `summary_teacher` object to `filter` and choose only the rows where `rank` equals `1:10`.
+- Using `summarise`, create `avg_teach` which calculates the mean `teacher_edu`.
+- Call that expression `bottom_10`.
+
+- Just below that, repeat the same expression and `filter` where `rank` equals `90:100`.
+- Using `summarise`, create `avg_teach` which calculates the mean `teacher_edu`.
+- Call that second expression `top_10`.
+
+dplyr and relational databases
+========================================================
+
+Answer
+
+
+```r
+bottom_10 <-
+  summary_teacher %>%
+  filter(rank %in% 1:10) %>%
+  summarise(avg_teach = mean(teacher_edu, na.rm = T))
+
+top_10 <-
+  summary_teacher %>%
+  filter(rank %in% 90:100) %>%
+  summarise(avg_teach = mean(teacher_edu, na.rm = T))
+```
+
+dplyr and relational databases
+========================================================
+
+Finally, `left_join` the `top_10` dataset with the `bottom_10` by the key `CNT`.
+
+dplyr and relational databases
+========================================================
+Answer
+
+```r
+top_10 %>%
+  left_join(bottom_10, by = "CNT")
+```
+
+```
+# A tibble: 8 × 3
+                   CNT avg_teach.x avg_teach.y
+                 <chr>       <dbl>       <dbl>
+1            Australia    3.437500    3.133333
+2               Brazil    3.066667    3.125000
+3               Canada         NaN         NaN
+4             Colombia    4.000000    3.636364
+5                Italy    2.904762    2.714286
+6      Spain (Regions)         NaN         NaN
+7 United Arab Emirates    3.333333    3.181818
+8       United Kingdom         NaN         NaN
+```
+
+Voila! That's a complex operation we did there. We merged a bunch of datasets and calculated some summary statistics.
+
+dplyr and relational databases
+========================================================
+
+Lastly, `dplyr` also has `bind_rows` and `bind_cols`. They are two straightforward functions that bind rows and columns.
+
+
+```r
+df1 <- tibble(x = 1:5, b = letters[1:5])
+df2 <- tibble(x = 6:10, b = letters[6:10], c = "Test")
+
+df1 %>%
+  bind_rows(df2[-3])
+
+df1 %>%
+  bind_cols(df2[3])
+```
+
+Strings and regular expressions
+========================================================
+
+```r
+library(stringr)
+
+str_length(c("a", "R for data science", NA))
+str_c("x", "y")
+str_c("x", "y", sep =" ,")
+str_to_upper(c("i", "bp"))
+str_to_lower(c("L", "BP"))
+```
+
+There's a lot possibilities with strings. Checkout chapter 14 of R4DS.
+
+Strings and regular expressions
+========================================================
+
+
+```r
+x <- c("apple", "pear", "banana")
+str_replace(x, "[aeiou]", "-")
+str_replace_all(x, "[aeiou]", "-")
+str_detect(x, "e")
+```
+
+There's a lot possibilities with strings. Checkout chapter 14 of R4DS.
+
+Thanks
+========================================================
+
+cimentadaj@gmail.com
+- If you want to propose any lectures/talks
+- If you want to join our mailing list
+
+<div align="center">
+<img src="./figures/tidyverse_pkg_stickers.png" width=800 height=530>
+</div>
+
+https://www.rstudio.com/wp-content/uploads/2015/02/data-wrangling-cheatsheet.pdf
