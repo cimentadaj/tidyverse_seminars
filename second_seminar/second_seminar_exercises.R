@@ -6,8 +6,6 @@
 install.packages("tidyverse", dependencies = T)
 
 # Packages:
-library(readr) # Reading csv
-library(haven) # Reading STATA, SPSS or SAS
 library(tidyverse)
 
 # Usual ggplot2 structure
@@ -64,7 +62,8 @@ read_sas() # SAS files
 read_excel() # Read .xls or .xlsx
 
 
-# 1. Let's use the population dataset which contains the population of several countries for some years.
+# 1.
+# Let's use the population dataset which contains the population of several countries for some years.
 # Have a look:
 population
 
@@ -77,19 +76,9 @@ population
 # EXTRA: sample some random countries with the function sample_n (?sample_n) and use ggplot
 # to visualize the results. Use the geom you find appropriate.
 
-population %>%
-  spread(year, population) %>%
-  group_by(country) %>%
-  mutate(diff = `2013` - `1995`) %>%
-  ungroup() %>%
-  sample_n(35) %>%
-  filter(complete.cases(.)) %>%
-  ggplot(aes(reorder(country, diff), diff)) +
-  geom_point() +
-  coord_flip()
 
-
-# 2. Let's calculate which century (21st of 20th) had a greater population growth for some countries.
+# 2.
+# Let's calculate which century (21st of 20th) had a greater population growth for some countries.
 # First, pipe the population tibble to separate and separate the year variable into two variables
 # called century and year. Divide the variable so that the `19` and `20` of 1999 and 2000 come in
 # the century variable and the `99` and `00` come in the year variable.
@@ -103,17 +92,28 @@ population %>%
 # Finish off by selecting country, century and the both variable, sample some random countries
 # and visualize with ggplot2 with your prefered geom.
 
-population %>%
-  separate(year, c("century", "year"), sep = 2) %>%
-  spread(year, population) %>%
-  mutate(twentyfirst = `13` - `00`,
-         twenty = `99` - `95`,
-         both = pmax(twentyfirst, twenty, na.rm = T)) %>%
-  select(country, century, both) %>%
-  filter(country %in% sample(unique(country), 30),
-         complete.cases(.)) %>%
-  ggplot(aes(reorder(country, both), both, colour = century)) +
-  geom_point(alpha = 0.7) +
-  coord_flip()
 
+# 3.
+# In this last exercise we'll compare the rate of population growth for two countries of your choice.
+# First, spread the country column into rows with the population variable to fill in the columns.
+# Select the year column and two countries of your choice.
+# Next we want to calculate the percentage in population for each year. For that we'll use
+# the code 'c(NA, diff(country)) / lag(country)'. Using mutate, create two new columns
+# containing each country's percentage change with the excerpt from above.
 
+# In my case, I have something like this:
+
+# A tibble: 19 × 5
+#      year    Spain   France france_diff  spain_diff
+#     <int>    <int>    <int>       <dbl>       <dbl>
+# 1   1995 39420568 58008958          NA          NA
+# 2   1996 39513721 58216225 0.003573017 0.002363056
+# 3   1997 39603778 58418324 0.003471524 0.002279132
+# 4   1998 39729942 58635564 0.003718696 0.003185656
+# 5   1999 39944692 58894671 0.004418939 0.005405243
+
+# Now let's gather that data so that france_diff and spain_diff become
+# stacked columns. Once you stack them, select only year and your two new columns. Finish by
+# visualizing your results in ggplot2. Put your year column in the X axis and the percentage column
+# in the Y axis. Use the group and colour option to specify the stacked column with the categories
+# and add geom_line(). Voila!
