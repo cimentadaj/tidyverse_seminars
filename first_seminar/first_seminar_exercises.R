@@ -120,7 +120,7 @@ Your answer
 
 # Wait! Before finishing, we'd want to see the worst and best performers.
 # Try piping the previous expression to the arrange() function and sorting
-# by the variable 'avg_country'. When you do, experiment by placing a minus
+# by the variable 'avg_math'. When you do, experiment by placing a minus
 # sign infront of the 'avg_country' variable.
 
 ########################################################################
@@ -167,7 +167,6 @@ Your answer
 # math_score and call that variable avg_schools. Remember to exclude missings!
 
 Your answer
-
 # Alright, now we have the mean math score for each school within each country
 # and within each region. We now want to calculate the country standard deviation
 # of these averages to estimates the between school variability in math.
