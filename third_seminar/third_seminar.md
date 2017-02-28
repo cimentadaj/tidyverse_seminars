@@ -9,7 +9,7 @@ height: 900
 
 
 
-The grammar of graphics
+The grammar of graphics 
 ========================================================
 
 ggplot2 is designed to work in a layered fashion, starting with a layer showing the raw data then adding layers of annotations and statistical summaries.
@@ -67,7 +67,7 @@ upd_bad_drivers %>%
 5            35           28
 ```
 
-In this case, each perc_speeding has a paired perc_alcohol with can be united in a coordinate system.
+In this case, each `perc_speeding` has a paired `perc_alcohol` which can be united in a coordinate system.
 
 Plots adaptable objects
 ========================================================
@@ -183,7 +183,7 @@ Plots adaptable objects
 
 - The _aes_ inside `ggplot` is short for aesthetics  
 - Each aesthetic can be mapped to another variable (in which case this aesthetic needs to be inside the `aes` function) or;
-- Each aesthetic can be mapped to a constant value (in which case this aesthetic needs to be outside the `aes` function)
+- Each aesthetic can be mapped to a constant value (in which case this aesthetic needs to be outside the `aes` function but _inside_ a `geom` object)
 
 
 ```r
@@ -227,9 +227,9 @@ into:
 
 ```
          x        y     ymin     ymax       se PANEL group  colour   fill
-1 13.00000 29.68310 22.94103 36.42518 3.346888     1    -1 #3366FF grey60
-2 13.51899 29.53649 23.42741 35.64557 3.032657     1    -1 #3366FF grey60
-3 14.03797 29.40007 23.88131 34.91883 2.739612     1    -1 #3366FF grey60
+1 13.00000 27.87365 24.78016 30.96715 1.538568     1    -1 #3366FF grey60
+2 13.51899 27.95385 24.92805 30.97964 1.504895     1    -1 #3366FF grey60
+3 14.03797 28.03404 25.07552 30.99255 1.471432     1    -1 #3366FF grey60
   size linetype weight alpha
 1    1        1      1   0.4
 2    1        1      1   0.4
@@ -240,9 +240,7 @@ Plots adaptable objects
 ========================================================
 Statistical transformations:
 
-Each `geom_*()` object is supported by a `stat_*()` function that transforms the data in a suitable format for the `geom_()` object.
-
-For example, `stat_smooth()` is the one carrying out the transformation of the data. Check `?stat_smooth` for more details.
+Each `geom_*()` object is supported by a `stat_*()` function that transforms the data in a suitable format for the `geom_()` object.  For example, `stat_smooth()` is the one carrying out the transformation of the data. Check `?stat_smooth` for more details.
 
 We could do this:
 
@@ -272,7 +270,7 @@ upd_bad_drivers %>%
 
 Plots adaptable objects
 ========================================================
-Together, the `data`, `aes`thetics `stat_*`, `geom_*` and `faceting` form a layer.
+Together, the `data`, `aes`thetics, `stat_*`, `geom_*` and `faceting` form a layer.
 
 The grammar of graphics allows you overlap layers in a way that makes sense for your specific problems. Let's look at a simple example.
 
@@ -423,7 +421,7 @@ What would the plot look like on its own?
 ```r
 confidence_bad_drivers %>%
   ggplot() +
-  geom_errorbar(aes(x = region, ymin = ymin, ymax = ymax)) +
+  geom_errorbar(aes(x = region, ymin = ymin, ymax = ymax), colour = 'blue') +
   geom_point(data = upd_bad_drivers, aes(x = region, y = perc_speeding))
 ```
 
@@ -466,12 +464,11 @@ ggplot() +
   geom_errorbar(data = regionline, aes(region, ymin = ymin, ymax = ymax), colour = 'blue')
 ```
 
-<img src="third_seminar-figure/unnamed-chunk-28-1.png" title="plot of chunk unnamed-chunk-28" alt="plot of chunk unnamed-chunk-28" style="display: block; margin: auto;" />
+Next slide is the graph.
 
 Plots adaptable objects
 ========================================================
 
-Next slide is the graph.
 <img src="third_seminar-figure/unnamed-chunk-29-1.png" title="plot of chunk unnamed-chunk-29" alt="plot of chunk unnamed-chunk-29" style="display: block; margin: auto;" />
 
 Plots adaptable objects
@@ -566,17 +563,17 @@ See [here](http://sape.inf.usi.ch/quick-reference/ggplot2/geom)
 Different types of plots in ggplot2
 ========================================================
 
-Next on make each of these graph and learn about legends, scales, axes and titles.
+Next on we're gonna make each of these graphs and learn about legends, scales, axes and titles.
 
 Since we already generated some scatterplots, let's start with a barplot.
 
-- Barplots count the frequency of cases within a categorical variable. We can safely assume that `geom_bar` accepts one required `aes`thetic, an `x`. 
+- Barplots count the frequency of cases within a categorical variable. We can safely assume that `geom_bar` accepts one required `aes`thetic: an `x`. 
 
 With what you've been introduced, you're capable enough of creating the plot.
 
-Hint:
+Hint:  
 `data` = `upd_bad_drivers`  
-`x` = `division`  
+`x` = `region`  
 `geom_bar()`
 
 Remember to set _all_ of these options as 'global' parameters in the ggplot chain.
@@ -586,20 +583,20 @@ Different types of plots in ggplot2
 
 
 ```r
-ggplot(upd_bad_drivers, aes(x = division)) +
+ggplot(upd_bad_drivers, aes(x = region)) +
   geom_bar()
 ```
 
 <img src="third_seminar-figure/unnamed-chunk-34-1.png" title="plot of chunk unnamed-chunk-34" alt="plot of chunk unnamed-chunk-34" style="display: block; margin: auto;" />
 
-We wanna give each of the bars a different `fill` and then set the transparency (`alpha`) to `0.4`. Remember you'll be specifying two `aes`thetics but the first one mapped to a `variable` while the second to a constant value.
+We wanna give each of the bars a different `fill` based on the `division` variable and then set the transparency (`alpha`) to `0.7`. Remember you'll be specifying two `aes`thetics but the first one mapped to a `variable` while the second to a constant value.
 
 Different types of plots in ggplot2
 ========================================================
 
 
 ```r
-ggplot(upd_bad_drivers, aes(x = division, fill = division), alpha = 0.4) +
+ggplot(upd_bad_drivers, aes(x = region, fill = division), alpha = 0.7) +
   geom_bar()
 ```
 
@@ -613,8 +610,8 @@ Another caveat: if the `aes`thetic is set to a constant value, then it needs to 
 
 
 ```r
-ggplot(upd_bad_drivers, aes(x = division, fill = division)) +
-  geom_bar(alpha = 0.4)
+ggplot(upd_bad_drivers, aes(x = region, fill = division)) +
+  geom_bar(alpha = 0.7)
 ```
 
 <img src="third_seminar-figure/unnamed-chunk-36-1.png" title="plot of chunk unnamed-chunk-36" alt="plot of chunk unnamed-chunk-36" style="display: block; margin: auto;" />
@@ -635,23 +632,339 @@ Different types of plots in ggplot2
 
 `scale_fill_discrete()` was the correct answer!
 
-What can we control with this function?
-discrete_scale(
-aesthetics,
-scale_name,
-palette,
-name = waiver(),
-breaks = waiver(),
-labels = waiver(),
-limits = NULL,
-expand = waiver(),
-na.translate = TRUE,
-na.value = NA,
-drop = TRUE,
-guide = "legend",
-position = "left",
-super = ScaleDiscrete)
+What can we control with this function? 
 
-How to change specific legend colours?
-How to combine two legends into one?
-How to move X or Y labels into horizontal or vertical.
+discrete_scale(  
+
+aesthetics,  
+scale_name,  
+palette,  
+name = waiver(),  
+breaks = waiver(),  
+labels = waiver(),  
+limits = NULL,  
+expand = waiver(),  
+na.translate = TRUE,  
+na.value = NA,  
+drop = TRUE,  
+guide = "legend",  
+position = "left",  
+super = ScaleDiscrete  
+)
+
+Different types of plots in ggplot2
+========================================================
+
+It's important to understand how `name`, `breaks`, `labels` and `limits` work. They pretty much control the looks of your legend or scale.
+
+
+```r
+ggplot(upd_bad_drivers, aes(x = region, fill = division)) +
+  geom_bar(alpha = 0.7) +
+  scale_fill_discrete(name = "Regional division",
+                      labels = paste("region", 1:9))
+```
+
+<img src="third_seminar-figure/unnamed-chunk-37-1.png" title="plot of chunk unnamed-chunk-37" alt="plot of chunk unnamed-chunk-37" style="display: block; margin: auto;" />
+
+Different types of plots in ggplot2
+========================================================
+What type of variable is our `y` variable? categorical, continuous, etc.?
+
+Use `scale_y_youranswer` to change the axis of the `y` or `x` variables.
+
+
+```r
+ggplot(upd_bad_drivers, aes(x = region, fill = division)) +
+  geom_bar(alpha = 0.7) +
+  scale_fill_discrete(name = "Regional division",
+                      labels = paste("region", 1:9)) +
+  scale_y_continuous(name = "Our count",
+                     breaks = seq(0, 20, 2),
+                     limits = c(0, 20))
+```
+
+Different types of plots in ggplot2
+========================================================
+What type of variable is our `x` variable? categorical, continuous, etc.?
+
+Use `scale_x_youranswer` to change the axis of the `y` or `x` variables.
+
+
+```r
+ggplot(upd_bad_drivers, aes(x = region, fill = division)) +
+  geom_bar(alpha = 0.7) +
+  scale_fill_discrete(name = "Regional division",
+                      labels = paste("region", 1:9)) +
+  scale_y_continuous(name = "Our count",
+                     breaks = seq(0, 20, 2),
+                     limits = c(0, 20)) +
+  scale_x_discrete(name = "Our regions",
+                   labels = c("North C", "Northeast", "Down South", "Westcoast"))
+```
+
+Different types of plots in ggplot2
+========================================================
+
+## type ?scale_
+
+Pretty much anything in ggplot has a `scale_*_*` function!  
+
+The good thing is that almost all of these functions work exactly the same way. If you learn how these 4 or 5 arguments work then you can manipulate the aspect of all `aes`thetics.
+
+Different types of plots in ggplot2
+========================================================
+
+Finally, how do you control the title of the plot?
+
+Just as easy as adding ` + ggtitle("Our title")`.
+
+Different types of plots in ggplot2
+========================================================
+
+<img src="third_seminar-figure/unnamed-chunk-40-1.png" title="plot of chunk unnamed-chunk-40" alt="plot of chunk unnamed-chunk-40" style="display: block; margin: auto;" />
+
+Different types of plots in ggplot2
+========================================================
+
+Let's continue building the other plots but this time you'll be doing it.
+
+With the data `upd_bad_drivers`..  
+- plot the variable `perc_speeding` with a `geom_histogram`.
+- Before you run the plot control how many bins are in `geom_histogram` with `bins = 30` and add
+`scale_x_continuous` to set the `breaks` with `seq(10, 50, 5)`.
+
+Different types of plots in ggplot2
+========================================================
+##### Answer:
+
+
+```r
+ggplot(upd_bad_drivers, aes(x = perc_speeding)) +
+  geom_histogram(bins = 30) +
+  scale_x_continuous(breaks = seq(10, 60, 5))
+```
+
+<img src="third_seminar-figure/unnamed-chunk-41-1.png" title="plot of chunk unnamed-chunk-41" alt="plot of chunk unnamed-chunk-41" style="display: block; margin: auto;" />
+
+Different types of plots in ggplot2
+========================================================
+
+Let's build a `geom_boxplot`. Boxplots require a categorical `x` variable and a continuous `y` variable.
+
+Build a a `geom_boxplot` with `upd_bad_drivers` as the data, `region` as the `x` variable and `perc_speeding` as the `y` variable. Save that to an object called `region_box`
+
+Different types of plots in ggplot2
+========================================================
+###### Answer:
+
+
+```r
+(region_box <- ggplot(upd_bad_drivers, aes(x = region, y = perc_speeding)) +
+  geom_boxplot())
+```
+
+<img src="third_seminar-figure/unnamed-chunk-42-1.png" title="plot of chunk unnamed-chunk-42" alt="plot of chunk unnamed-chunk-42" style="display: block; margin: auto;" />
+
+Different types of plots in ggplot2
+========================================================
+To the `region_box` object add (`+`) an `aes` call with a `fill` aesthetic by the variable `division`.
+
+Save that to the `region_box` again.
+
+Different types of plots in ggplot2
+========================================================
+
+
+```r
+(region_box <- region_box + aes(fill = division))
+```
+
+<img src="third_seminar-figure/unnamed-chunk-43-1.png" title="plot of chunk unnamed-chunk-43" alt="plot of chunk unnamed-chunk-43" style="display: block; margin: auto;" />
+
+Let's change some of the features of this plot.
+
+With this structure: `region_box` + ...
+- Add `scale_fill_discrete` to change the `name` of the legend to `Regional Divisions`
+- Add `ggtitle()` to include a title named 'Percentage speeding by regions and subdivisions'
+- Add `xlab` to change the x label to 'Region'
+- Add `ylab` to change the y label to 'Percentage Speeding'
+
+Different types of plots in ggplot2
+========================================================
+
+```r
+region_box +
+  scale_fill_discrete(name = "Regional Divisions") +
+  ggtitle("Percentage speeding by regions and subdivisions") +
+  xlab('Region') +
+  ylab('Percentage Speeding')
+```
+
+<img src="third_seminar-figure/unnamed-chunk-44-1.png" title="plot of chunk unnamed-chunk-44" alt="plot of chunk unnamed-chunk-44" style="display: block; margin: auto;" />
+
+Looks a bit better, eh?
+
+Different types of plots in ggplot2
+========================================================
+
+Let's move on to `geom_density()`. Let's have a look at the distribution of people who had an accident under alcohol consumption.
+
+`Data` = `upd_bad_drivers`  
+`x` = `perc_alcohol`  
+`geom` = `geom_density()`
+
+Finally, add (`+`) `facet_wrap(~ division)` to partition by regions
+
+Different types of plots in ggplot2
+========================================================
+###### Answer:
+
+
+```r
+ggplot(upd_bad_drivers, aes(perc_alcohol)) +
+  geom_density() +
+  facet_wrap(~ division)
+```
+
+<img src="third_seminar-figure/unnamed-chunk-45-1.png" title="plot of chunk unnamed-chunk-45" alt="plot of chunk unnamed-chunk-45" style="display: block; margin: auto;" />
+
+Different types of plots in ggplot2
+========================================================
+
+Let's move to a line plot. Line plots are usually generated for longitudinal data but we can use it for something else. We can answer this question: 
+
+- In which states accidents were more due to speeding RATHER than due to alcohol consumption?
+
+First we have to prepare the data. If you participated in the data cleaning seminar, then you should know this!
+
+
+```r
+summary_data <-
+  upd_bad_drivers %>%
+  select(state, perc_speeding, perc_alcohol) %>%
+  gather(type_accident, perc, -state) %>%
+  mutate(type_accident = gsub("perc_", "",type_accident)) %>%
+  arrange(state, type_accident)
+head(summary_data, 4)
+```
+
+```
+# A tibble: 4 × 3
+    state type_accident  perc
+    <chr>         <chr> <int>
+1 Alabama       alcohol    30
+2 Alabama      speeding    39
+3  Alaska       alcohol    25
+4  Alaska      speeding    41
+```
+
+Different types of plots in ggplot2
+========================================================
+
+So now we have the data ready.. let's start the plot.
+
+- Using `summary_data`, specify `type_accident` as the `x` variable and `perc` as the `y` variable.
+- Add `geom_line()` to the call but use the `group` aesthetic to set it by `state`. This means that we want the lines to be grouped by `state`s. Otherwise the lines are treated in the same order of the data set (it assumes was have an ordered longitudinal data, as lines should be.)
+
+Different types of plots in ggplot2
+========================================================
+#### Answer:
+
+
+```r
+ggplot(summary_data, aes(x = type_accident, y = perc)) +
+  geom_line(aes(group = state))
+```
+
+<img src="third_seminar-figure/unnamed-chunk-47-1.png" title="plot of chunk unnamed-chunk-47" alt="plot of chunk unnamed-chunk-47" style="display: block; margin: auto;" />
+
+But this is a bit overwhelming.
+- We could add a state-colour for each line but it would be really difficult to read.
+- One alternative is to see if the majority of states has an upward or downward slope.
+
+Different types of plots in ggplot2
+========================================================
+We could set the colour of the lines to a dummy of whether the slope is upwards or downwards.
+
+How could we do that? Create a logical statement on the fly. Yet, there's a problem: our data is in a tidy format, making it difficult to construct the logical statement.
+
+Remember?
+
+
+```r
+head(summary_data, 5)
+```
+
+```
+# A tibble: 5 × 3
+    state type_accident  perc
+    <chr>         <chr> <int>
+1 Alabama       alcohol    30
+2 Alabama      speeding    39
+3  Alaska       alcohol    25
+4  Alaska      speeding    41
+5 Arizona       alcohol    28
+```
+
+Different types of plots in ggplot2
+========================================================
+We can exhibit or data ninja skills by `spread`ing the stacked columns, calculate the logical statement, and `gather` again to plot it.
+
+
+```r
+summary_data %>%
+  spread(type_accident, perc) %>%
+  mutate(slope = alcohol > speeding) %>%
+  gather(type_accident, perc, alcohol:speeding) %>%
+  ggplot(aes(x = type_accident, y = perc)) +
+  geom_line(aes(group = state, colour = slope))
+```
+
+<img src="third_seminar-figure/unnamed-chunk-49-1.png" title="plot of chunk unnamed-chunk-49" alt="plot of chunk unnamed-chunk-49" style="display: block; margin: auto;" />
+
+That was cool.
+
+Different types of plots in ggplot2
+========================================================
+
+We coud always just do a simple time series with the `economics` data. 
+
+- Pass `economics` to `ggplot()` and include `date` as `x` and `unemploy` as `y`.
+
+
+```r
+ggplot(economics, aes(date, unemploy)) + geom_line()
+```
+
+Different types of plots in ggplot2
+========================================================
+We can do some really fancy stuff once you know how to grammar and separate `geom`s work.
+
+<img src="third_seminar-figure/unnamed-chunk-51-1.png" title="plot of chunk unnamed-chunk-51" alt="plot of chunk unnamed-chunk-51" style="display: block; margin: auto;" />
+
+Wanna look at the code?  
+
+Wickham, Hadley. ggplot2: elegant graphics for data analysis. Springer, 2016.
+Pages 86-87
+
+Summary of ggplot2
+========================================================
+
+- It's very complex (read ggplot2's book)  
+
+- But it's based on a simple underlying grammar. If you master it, you can construct thousands of things!  
+- Don't concentrate solely on ggplot2: the input data must be in the right format, so be a data ninja.  
+
+- Master `geom`s, `aes`thetics and basic scale arguments and you should be able to perform hundreds of graphics with little code.
+
+============================================================
+
+# Thanks!
+## cimentadaj@gmail.com
+- If you want to be in our mailing list
+- Also, send feedback or want to propose a lecture/seminar
+
+<div align="center">
+<img src="./figures/tidyverse_pkg_stickers.png" width=800 height=530>
+</div>
