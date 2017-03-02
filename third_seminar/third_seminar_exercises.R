@@ -21,7 +21,7 @@ ggplot(aes(cyl), alpha = 0.5) +
 
 # 2nd.
 # Make a barplot with the `cyl` variable from mtcars and make the fill of each barplot unique
-# for each `cyl`. There's a catch: the `cyl` variable doesn't have the right class ;)
+# for each `cyl`. There's a catch.
 
 
 # 3rd.
