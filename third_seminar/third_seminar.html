@@ -792,7 +792,7 @@ hljs.initHighlightingOnLoad();
 
 </section>
 <section data-transition="linear" data-transition-speed="default">
-<h3>The grammar of graphics</h3>
+<h3>The grammar of graphics </h3>
 <div class="slideContent" >
 <p>ggplot2 is designed to work in a layered fashion, starting with a layer showing the raw data then adding layers of annotations and statistical summaries.</p>
 
@@ -815,8 +815,10 @@ Wickham, Hadley. ggplot2: elegant graphics for data analysis. Springer, 2016.</p
 <div class="slideContent" >
 <p>Briefly preparing the data:</p>
 
-<pre><code class="r">library(fivethirtyeight)
-library(tidyverse)
+<pre><code class="r">library(tidyverse)
+library(readr)
+
+bad_drivers &lt;- read_csv(&quot;https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/third_seminar/data/bad_drivers.csv&quot;)
 
 region_states &lt;- setNames(as.character(state.region), state.name)
 division_states &lt;- setNames(as.character(state.division), state.name)
