@@ -44,6 +44,7 @@ Link to slides
  
 **Seminar 2. Data cleaning made easy**  
 **Instructor: Jorge Cimentada**  
+
 Link to slides  
 [R exercises](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/second_seminar/second_seminar_exercises.R)  
 [R exercise answers](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/second_seminar/second_seminar_exercisesanswers.R)  
