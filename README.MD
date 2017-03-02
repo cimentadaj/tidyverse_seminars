@@ -16,7 +16,7 @@ The fourth session will show you the power of functions and loops. This means th
 
 Finally, the fifth session will wrap everything by showing you how to communicate your results and make your analysis reproducible. We’ll introduce you to Rmarkdown, a simple feature that allows you to write text and code in the same document. Yes! That means you can truly have your analysis together with your writeups all in one reproducible document. We will finish off by exploring a dataset and documenting everything into one nicely formatted document.  
 
-These sessions will be a simplification of what the tidyverse is capable of. For those interested in diving deep into what you can do with the it, we point you towards the book R for Data Science, written by Garrett Grolemund and Hadley Wickham (the main author of the tidyverse). These seminars are based extensively on this book which can be read for free  [here](http://r4ds.had.co.nz/) or bought [here](https://www.amazon.com/Data-Science-Transform-Visualize-Model/dp/1491910399/ref=sr_1_1?ie=UTF8&qid=1485972566&sr=8-1&keywords=r+for+data+science+import+tidy+transform) (you should be cool and buy it!).  
+These sessions will be a simplification of what the tidyverse is capable of. For those interested in diving deep into what you can do with it, we point you towards the book R for Data Science, written by Garrett Grolemund and Hadley Wickham (the main author of the tidyverse). These seminars are based extensively on this book which can be read for free  [here](http://r4ds.had.co.nz/) or bought [here](https://www.amazon.com/Data-Science-Transform-Visualize-Model/dp/1491910399/ref=sr_1_1?ie=UTF8&qid=1485972566&sr=8-1&keywords=r+for+data+science+import+tidy+transform) (you should be cool and buy it!).  
 
 We intend to make all seminars as interactive as possible. For that, we plan to learn the tidyverse by using it. We will develop the exercises for each class and give you the tools to start your analysis on the spot.  
 
@@ -42,7 +42,7 @@ Link to slides
 - Create your own Rstudio project  
 - Exploratory Data Analysis (EDA)  
  
-####Seminar 2. Data cleaning made easy
+Seminar 2. Data cleaning made easy
 ####Instructor: Jorge Cimentada  
 Link to slides  
 [R exercises](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/second_seminar/second_seminar_exercises.R)  
