@@ -99,5 +99,6 @@ R exercise answers
 - At this point we will provide everyone with a dataset and set a research question for you to explore. You’ll create a reproducible document where you’ll include both your comments and your results as we go through everyone’s desks to help.
 
 
-**The organizers of the tidyverse seminar**
+**The organizers of the tidyverse seminar**  
+
 **Jorge Cimentada and Bruno Arpino**
