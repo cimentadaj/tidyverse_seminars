@@ -28,8 +28,9 @@ We intend to make all seminars as interactive as possible. For that, we plan to 
 
 ##### Seminars Program:  
 
-##### Seminar 1. Data Exploration  
-##### Instructor: Jorge Cimentada  
+**Seminar 1. Data Exploration**  
+**Instructor: Jorge Cimentada**  
+
 Link to slides  
 [R exercises](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/first_seminar/first_seminar_exercises.R)  
 [R exercise answers](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/first_seminar/first_seminar_exercises_answers.R)  
@@ -56,8 +57,9 @@ Link to slides
 - Data manipulation the dplyr way  
 - What else should you learn? Factors, Dates and Regular expressions.  
 
-##### Seminar 3. ggplot2: The grammar of graphics  
-##### Instructor: Jorge Cimentada  
+**Seminar 3. ggplot2: The grammar of graphics**  
+**Instructor: Jorge Cimentada**  
+
 Link to slides  
 [R exercises](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/third_seminar/third_seminar_exercises.R)  
 [R exercise answers](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/third_seminar/third_seminar_exercisessolutions.R)  
@@ -70,8 +72,9 @@ Link to slides
 - Different types of plots in ggplot2  
 - What are aesthetics and how do they work?  
 
-##### Seminar 4. Automating everything: we should always strive for it!  
-##### Instructor: Jorge Cimentada  
+**Seminar 4. Automating everything: we should always strive for it!**  
+**Instructor: Jorge Cimentada**  
+
 Link to slides  
 R exercises  
 R exercise answers  
@@ -82,8 +85,9 @@ R exercise answers
 - Integrating statistical modeling into the tidyverse  
 - Visualizing regression models with broom and ggplot2  
 
-##### Seminar 5. Making your analysis reproducible  
-##### Instructor: Jorge Cimentada  
+**Seminar 5. Making your analysis reproducible**  
+**Instructor: Jorge Cimentada**  
+
 Link to slides  
 R exercises  
 R exercise answers  
@@ -94,5 +98,6 @@ R exercise answers
 - A subtle introduction to Sweave.  
 - At this point we will provide everyone with a dataset and set a research question for you to explore. You’ll create a reproducible document where you’ll include both your comments and your results as we go through everyone’s desks to help.
 
-The organizers of the tidyverse seminar
-Jorge Cimentada and Bruno Arpino
+
+__**The organizers of the tidyverse seminar
+Jorge Cimentada and Bruno Arpino**__
