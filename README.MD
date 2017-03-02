@@ -42,8 +42,8 @@ Link to slides
 - Create your own Rstudio project  
 - Exploratory Data Analysis (EDA)  
  
-Seminar 2. Data cleaning made easy  
-Instructor: Jorge Cimentada  
+**Seminar 2. Data cleaning made easy**  
+**Instructor: Jorge Cimentada**  
 Link to slides  
 [R exercises](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/second_seminar/second_seminar_exercises.R)  
 [R exercise answers](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/second_seminar/second_seminar_exercisesanswers.R)  
