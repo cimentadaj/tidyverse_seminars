@@ -35,8 +35,10 @@ Plots adaptable objects
 Briefly preparing the data:
 
 ```{r}
-library(fivethirtyeight)
 library(tidyverse)
+library(readr)
+
+bad_drivers <- read_csv("https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/third_seminar/data/bad_drivers.csv")
 
 region_states <- setNames(as.character(state.region), state.name)
 division_states <- setNames(as.character(state.division), state.name)
