@@ -100,5 +100,4 @@ R exercise answers
 
 
 **The organizers of the tidyverse seminar**  
-
 **Jorge Cimentada and Bruno Arpino**
