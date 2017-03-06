@@ -12,24 +12,26 @@ height: 900
 
 Functions in R
 ========================================================
+This is a function.
 
 
 ```r
-my_name <- function(first_name, last_name) {
-  paste(first_name, last_name, collapse = "")
+adds_1 <- function(my_number) {
+  my_number + 1
 }
 
-my_name("Jorge", "Cimentada")
+adds_1(5)
 ```
 
 ```
-[1] "Jorge Cimentada"
+[1] 6
 ```
   
-- You need to pick a name for the function.
-- You list the inputs, or arguments, to the function inside function.
-- You place the code you have developed in body of the function.  
+- You need to pick a _name_ for the function  
 
+- You list the inputs or _arguments_ inside the blue function  
+
+- You place the code you have developed in _body_ of the function  
 
 #### When should you write a function?
 Write a function whenever you’ve copied and pasted a block of code more than twice.
@@ -41,16 +43,14 @@ Functions can be used within other functions:
 
 
 ```r
-my_profile <- function(first_name, last_name, age) {
-  paste(my_name(first_name, last_name), "is", age, "years old", collapse = "")
+multiplier <- function(x, number) {
+  adds_1(x) * number
 }
 
-my_profile("Jorge", "Cimentada", 26)
+multiplier(5, 2)
 ```
 
-```
-[1] "Jorge Cimentada is 26 years old"
-```
+What is the result of this function call?
 
 Functions in R
 ========================================================
@@ -64,7 +64,6 @@ There are a couple of rules that you need to follow when creating functions.
 random_num_generator <- function() {
   x <- rnorm(100)
   y <- rnorm(100)
-  
   plot(x, y)
 }
 
@@ -93,18 +92,15 @@ environment()
 The environment inside a function (randomly generated)
 
 ```r
-function_env <- function() {
-  environment()
-}
-
+function_env <- function() environment()
 function_env()
 ```
 
 ```
-<environment: 0x7fa9c2e52108>
+<environment: 0x7fb2edd72468>
 ```
 
-After the function ends the new environment is automatically destroyed.
+## Think of environments as boxes that contain objects such as functions and vectors. Inside functions, this box is created when function runs and deleted when the function ends.
 
 Functions in R
 ========================================================
@@ -144,7 +140,7 @@ class(our_useless_fun())
 
 Functions in R
 ========================================================
-**Name masking**
+*Name masking*
 
 Remember this function?
 
@@ -152,12 +148,11 @@ Remember this function?
 random_num_generator <- function() {
   x <- rnorm(100)
   y <- rnorm(100)
-  
   plot(x, y)
 }
 ```
 
-- The function will search for `x` and `y` inside the functions environment.
+- The function will search for `x` and `y` inside the functions environment
 - If it doesn't find it, it will look for the function in the next environment _higher_ up.
 
 Functions in R
@@ -175,13 +170,11 @@ random_num_generator()
 
 <img src="fourth_seminar-figure/unnamed-chunk-10-1.png" title="plot of chunk unnamed-chunk-10" alt="plot of chunk unnamed-chunk-10" style="display: block; margin: auto;" />
 
-### How is the function doing the look up of the variables?
+### How is the function searching for the variables?
 
 Functions in R
 ========================================================
-
 Even harder:
-
 
 ```r
 set.seed(1)
@@ -200,6 +193,7 @@ m()
 
 - Do we get an error?
 - Whats the output like?
+- Try to visualize it as boxes within boxes within boxes
 
 Functions in R
 ========================================================
@@ -325,6 +319,25 @@ Finally, a function *always* returns the last line of code unless specified othe
 
 ```r
 my_fun <- function(x) {
+  "Hey, should I be the output?"
+  rnorm(x)
+}
+
+my_fun(10)
+```
+
+```
+ [1]  3.2021436  0.5629019  1.0993036  1.4101540  0.6593009  1.3029178
+ [7]  0.6907743 -1.1808998  0.1149726 -0.7496940
+```
+
+Functions in R
+========================================================
+A function always returns the last line, even if the last line doesn't return anything!
+
+
+```r
+my_fun <- function(x) {
   rnorm(x)
   y <- x
 }
@@ -334,7 +347,7 @@ my_fun(10)
 
 Functions in R
 ========================================================
-We get something in return, which is the last line, but remember that the `<-` operator doesn't print the results.
+But we do get something in return, but remember that the `<-` operator doesn't print the results.
 
 This way we can see the return of the function:
 
@@ -359,7 +372,7 @@ our_range <- function(x) {
   if (length(x) == 1) {
     return(x)
   }
-  print("This shouldn't print!")
+  print("If the input is longer than 1, This should print!")
   c(min(x), max(x))
 }
 
@@ -367,7 +380,7 @@ our_range(1:10)
 ```
 
 ```
-[1] "This shouldn't print!"
+[1] "If the input is longer than 1, This should print!"
 ```
 
 ```
@@ -382,7 +395,7 @@ our_range(5)
 [1] 5
 ```
 
-When `return()` is used, the function only runs until `return()` and simply returns that value.
+When `return()` is used, the function only runs until `return()`.
 
 Functions in R
 ========================================================
@@ -393,13 +406,12 @@ Let's get some practice. This is how you calculate the variance of a series of n
 <img src="./figures/variance.png" width=2000 height=350>
 </div>  
   
-  
 ### Let's start with everything inside the parethesis of the numerator
 
 Functions in R
 ========================================================
 
-- Create a vector called `x` which has a `rnorm(100)` inside. With this we'll generate `100` random numbers with a normal distribution.  
+- Create a vector called `x` which has `rnorm(100)` inside. With this we'll generate `100` random numbers with a normal distribution.  
 
 - Let's subtract each `x` from the `mean(x)`. This will give us the deviations from the overall mean.  
 
@@ -440,7 +452,7 @@ x - mean(x)
 ```
 
 - Wrap `x - mean(x)` in parenthesis and raise it to the second power (`^2`)
-- Wrap the previous expression in the `sum()` function to get the sum of squared deviations.
+- Wrap the previous expression with `sum()` to get the sum of squared deviations.
 - Save that expression with the name `deviance_sq`.
 
 Functions in R
@@ -449,15 +461,12 @@ Functions in R
 
 
 ```r
-set.seed(1)
-x <- rnorm(100)
 deviance_sq <- sum((x - mean(x)) ^ 2)
 ```
 
 We have the numerator done! Let's finish the denominator.
 
-- Take the `length` of `x` minus `1` and save it with a name `denominator`.
-
+- Take the `length()` of `x` minus `1` and save it with a name `denominator`.
 
 Functions in R
 ========================================================
@@ -465,9 +474,6 @@ Functions in R
 
 
 ```r
-set.seed(1)
-x <- rnorm(100)
-deviance_sq <- sum((x - mean(x)) ^ 2)
 denominator <- length(x) - 1
 ```
 
@@ -479,11 +485,6 @@ Functions in R
 
 
 ```r
-set.seed(1)
-x <- rnorm(100)
-deviance_sq <- sum((x - mean(x)) ^ 2)
-denominator <- length(x) - 1
-
 our_result <- deviance_sq / denominator
 ```
 
@@ -515,8 +516,8 @@ your_function_name <- function(your_argument1, your_argument2, etc..) {
 
 - Call your function `our_variance`
 _ Set `x` as the first and only argument of the function.
-- Include the calculate of `deviance_sq` and `denominator` in the body of the function
-- Make sure to return `deviance_sq / denominator` as the last line in your function (without saving it to any name)
+- Include the calculations of `deviance_sq` and `denominator` in the body of the function
+- Make sure to have `deviance_sq / denominator` as the last line in your function (without saving it to any name)
 
 Functions in R
 ========================================================
@@ -533,7 +534,7 @@ our_variance <- function(x) {
 }
 ```
 
-- Save the function by running it either in the console or in the script.
+- Save the function by running it either the console or in the script.
 - Try it out!
  
 
@@ -551,23 +552,24 @@ our_variance(x); var(x)
 [1] 1.34604
 ```
 
-
 Functions in R
 ========================================================
-This is the formula for the standard deviation:
+Congrats! That's your first function, if you hadn't created one.
+
+Now, this is the formula for the standard deviation:
 
 <div align="center">
-<img src="./figures/standard_dev.png" width=1500 height=650>
+<img src="./figures/standard_dev.png" width=1500 height=600>
 </div>  
 
-Comparing this to the variance formula, how is this different?
+## Comparing this to the variance formula, how is this different?
 
 Functions in R
 ========================================================
 
 Let's implement it ourself. Remember that `our_variance` already calculates the variance so we simply need to...
-- Wrap `our_variance` with the `sqrt()` function..
-- Wrap that in a function called `our_sd` and;
+- Wrap `our_variance` with the `sqrt()` function
+- Wrap that in a function called `our_sd` and
 - Remember that this new function will only accept one argument, `x`, which is gonna be passed to `our_variance`.
 
 Functions in R
@@ -581,6 +583,7 @@ our_sd <- function(x) {
 ```
 
 Let's explain how this works:
+
 - `our_sd` first searches for `our_variance` inside the function body and once it doesn't find it, it searches in the global environment and finds it.
 
 - `x` is passed to `our_variance`, the function returns the variance, and then `sqrt` simply takes the
@@ -614,12 +617,12 @@ system.time(our_sd(x)); system.time(sd(x))
 
 ```
    user  system elapsed 
-  0.067   0.006   0.074 
+  0.066   0.006   0.073 
 ```
 
 ```
    user  system elapsed 
-  0.041   0.000   0.041 
+  0.039   0.000   0.039 
 ```
 
 Functions in R
@@ -628,17 +631,17 @@ Functions in R
 Most basic R functions are implement in C++ for faster performance.
 
 - It's better to leave base functions as they are.
-- This example is simply to exemplify how to create functions!
+- This example is simply to show you how to create functions!
 
 Functions in R
 ========================================================
-Let's extend the standard deviation to create a function that estimates confidence intervals.
+Let's extend the standard deviation to create a function that calculates confidence intervals.
 
 I won't bore you with the statistics so I'll give you the confidence intervals estimation.
 
 
 ```r
-x <- rnorm(10^5, mean = 5, sd = 5) # Our value of interest
+x <- rnorm(10^5, mean = 5, sd = 5) # Our variable of interest
 ci_level <- 0.95 # Our confidence interval
 
 # Z value calculation
@@ -646,14 +649,14 @@ a <- (1 - ci_level) / 2
 z_value <- qnorm(1 - a)
 
 # Confidence interval calcuation
-lower_ci <- mean(x) -  (z_value * our_sd(x)) # See using our_sd function which uses our_variance
+lower_ci <- mean(x) -  (z_value * our_sd(x)) # We use our_sd function which uses our_variance. How cool!
 upper_ci <- mean(x) +  (z_value * our_sd(x))
 ```
 
 Now, you complete the work:
 
 - Create a function with the name `our_ci`.
-- This function will have two argument, one called `x`, and another one called `ci_level` which will have the number `0.95` by default.
+- This function will have two arguments, one called `x`, and another one called `ci_level` which will have the number `0.95` by default.
 - Paste the previous code inside the function excluding the `x` function and the `ci_level` vector.
 
 Functions in R
@@ -677,15 +680,13 @@ our_ci <- function(x, ci_level = 0.95) {
 
 Functions in R
 ========================================================
-
+### Answer:
 
 ```r
 our_ci <- function(x, ci_level = 0.95) {
-
   # Z value calculation
   a <- (1 - ci_level) / 2
   z_value <- qnorm(1 - a)
-  
   # Confidence interval calcuation
   lower_ci <- mean(x) -  (z_value * our_sd(x)) # See using our_sd function which uses our_variance
   upper_ci <- mean(x) +  (z_value * our_sd(x))
@@ -695,14 +696,9 @@ our_ci <- function(x, ci_level = 0.95) {
 ```
 
 
-Functions in R
-========================================================
-
-
 ```r
 age <- rnorm(10^5, mean = 10, sd = 2)
-
-our_ci(age, ci_level = 0.95); our_ci(age, ci_level = 0.90)
+our_ci(age, ci_level = 0.95); our_ci(age, ci_level = 0.50)
 ```
 
 ```
@@ -712,24 +708,8 @@ lower_bound upper_bound
 
 ```
 lower_bound upper_bound 
-   6.706938   13.277709 
-```
-
-```r
-our_ci(age, ci_level = 0.80); our_ci(age, ci_level = 0.50) 
-```
-
-```
-lower_bound upper_bound 
-   7.432588   12.552060 
-```
-
-```
-lower_bound upper_bound 
    8.645116   11.339531 
 ```
-
-Pretty neat, eh?
 
 Loops, apply family and purrr package.
 ========================================================
@@ -752,7 +732,8 @@ for (i in 1:5) {
 [1] 5
 ```
 
-- Each time the loop starts, it replaces `i` with the corresponding number.
+- In the first run, `i == 1` because `1` is first number of `1:5`. In the second run `i == 2`, and so on.
+- If the sequence would've been `2`, `4` and `6`, then in the first run `i == 2`, runs everything and then starts again with `i == 4` and so on.
 
 Loops, apply family and purrr package.
 ========================================================
@@ -776,13 +757,13 @@ for (i in 1:5) {
 
 Loops, apply family and purrr package.
 ========================================================
-And most commonly in R, you can the `i` to *subset* numbers from vectors. This loop you will write yourself.
+And most commonly, in R, you can use the `i` to *subset* numbers from vectors. _This loop you will write yourself._
 
-We want to create a loop that calculates the confidence interval of our `x` variable but for many confidence values without having to rewrite the same function several times.
+We want to create a loop that calculates the confidence interval of our `x` variable for several `ci_values` without having to rewrite the same expression several times.
 
 - Create a vector called `ci_values` which has this sequence of numbers: `seq(0.50, 0.90, 0.10)`. (Check its contents)
-- How long is `ci_values`? Calculate its length with `length()` and save it to a name called `n`.
-- Create an empty loop skeleton like the previous one
+- How long is `ci_values`? Calculate its length with `length()` and save it to the name `n`.
+- Create an empty _loop_  skeleton like the previous one
 
 Loops, apply family and purrr package.
 ========================================================
@@ -798,9 +779,10 @@ for () {
 }
 ```
 
-- We want to loop through the values in `ci_values` so we need to have a sequence of numbers of 1:length(ci_values). This will make sure to index EACH value of the ci_values.
+- We want to loop through the values in `ci_values` so we need to have a sequence of numbers of `1:length(ci_values)`. This will make sure to index EACH value of the ci_values.
 - Inside the parenthesis make sure `i` loops through `1:n`. Have a look at the previous loop if you forgot the syntax!
-- Using `our_ci` function, calculate the confidence interval for x, but in the `ci_level` argument specify `ci_values[i]`.
+- Using the `our_ci` function, calculate the confidence interval for x
+- In the `ci_level` _argument_ (second argument of the function) specify `ci_values[i]`.
 
 Loops, apply family and purrr package.
 ========================================================
@@ -827,6 +809,8 @@ What is happening here?
 Loops, apply family and purrr package.
 ========================================================
 
+## Result:
+  
 
 ```r
 ci_values <- seq(0.50, 0.90, 0.10)
@@ -855,9 +839,9 @@ Loops, apply family and purrr package.
 
 Loops are concepts from computer science that are widespread across all programming languages.
 
-But in R, they're usually not advised unless in specific situations.
+But in R, they're usually not advised unless in specific situations:
 
-The main reason is that loops tend to be slow (see [here](http://stackoverflow.com/questions/7142767/why-are-loops-slow-in-r) for an explanation why loops are slow and a counter-explanation from Karl Broman with an article showing that loops are ideal in some situations)
+- The main reason is that loops tend to be slow (see [here](http://stackoverflow.com/questions/7142767/why-are-loops-slow-in-r) for an explanation why loops are slow and a counter-explanation from Karl Broman with an article showing that loops are ideal in some situations)
 
 For that reason, R users have developed the `apply` family and the tidyverse has the `purrr` package.
 
@@ -910,7 +894,7 @@ So `sapply` passes the first argument of `sapply` to the argument of the `adder`
 
 Loops, apply family and purrr package.
 ========================================================
-The apply family of functions(`sapply`, `lapply`, `apply`, `vapply`, `tapply`, etc..) work VERY similarly, so if you understand how one works you can undestand how all work.
+The apply family of functions(`sapply`, `lapply`, `apply`, `vapply`, `tapply`, etc..) work VERY similarly, so if you understand how one works you can undestand how most work.
 
 For example, `sapply` is the same as `lapply` but `lapply` ONLY returns a list.
 
@@ -944,7 +928,6 @@ Loops, apply family and purrr package.
 
 Don't get stuck up on simply moving values into a functions arguments.
 
-What is this result of this:
 
 ```r
 descriptives <- list(mean, median, our_sd, our_variance, our_ci)
@@ -954,17 +937,17 @@ sapply(descriptives, function(our_fun) our_fun(x))
 The function on the right is called an `anonymous function`. This means that the function is created on the spot (it doesn't have a name).
 
 This code might look daunting but we're effectively doing the same thing:
-- Take the first object of `descriptives` and pass it as the first argument of the function.
+- Take the first object of `descriptives` and pass it as the first argument of the `anonymous function`
 - The first argument in the function is named `our_fun` and this argument then wraps `x` (which is our vector of interest)
 - So the first run of the loop will take the function `mean` and calculate `mean(x)`
 - The second run of the loop will take the function `median` and calculate `median(x)`
-- And so on.. until the end of the list `descriptives`.
+- And so on.. until the end of the list `descriptives`
 
 ## Why is the output of sapply a list?
 
 Loops, apply family and purrr package.
 ========================================================
-If you understand the `apply` functions, the `purrr` is even easier.
+If you understand the `apply` functions, `purrr` is even easier because all functions workly similarly.
 
 `purrr` is a rewrite of the `apply` family but with more consistency. Every looping function in `purrr` is called `map` instad of `apply`:
 
@@ -978,7 +961,7 @@ map_dbl(.x, .f, ...) # Always returns a double
 map_df(.x, .f, ..., .id = NULL) # Always returns a data frame
 ```
 
-`.x` is always the value and `.f` is always the function (this order is not the same in the `apply` functions).
+`.x` is always the value and `.f` is always the function (this order is not the same in the `apply` functions, see `?sapply` and `?mapply`).
 
 All `map` variants make the sure the result is of the class `lgl`, `chr`, etc.. (remember how `sapply` gave us a list?)
 
@@ -1055,24 +1038,22 @@ Briefly, `nest` is a function that turns chunks of data frames into lists.
 (student_nested <-
   student %>%
   group_by(CNT) %>%
-  nest())
+  nest()) %>%
+  head(8)
 ```
 
 ```
-# A tibble: 69 × 2
-                    CNT                 data
-                  <chr>               <list>
-1   Trinidad and Tobago  <tibble [84 × 920]>
-2  United Arab Emirates <tibble [270 × 920]>
-3            Luxembourg  <tibble [95 × 920]>
-4                Turkey  <tibble [98 × 920]>
-5                Latvia  <tibble [93 × 920]>
-6                Brazil <tibble [406 × 920]>
-7               Finland <tibble [119 × 920]>
-8               Tunisia  <tibble [92 × 920]>
-9    Russian Federation <tibble [125 × 920]>
-10       Czech Republic <tibble [126 × 920]>
-# ... with 59 more rows
+# A tibble: 8 × 2
+                   CNT                 data
+                 <chr>               <list>
+1  Trinidad and Tobago  <tibble [84 × 920]>
+2 United Arab Emirates <tibble [270 × 920]>
+3           Luxembourg  <tibble [95 × 920]>
+4               Turkey  <tibble [98 × 920]>
+5               Latvia  <tibble [93 × 920]>
+6               Brazil <tibble [406 × 920]>
+7              Finland <tibble [119 × 920]>
+8              Tunisia  <tibble [92 × 920]>
 ```
 
 This is VERY powerful.. look at the simpleness of this `tibble`.
@@ -1081,7 +1062,7 @@ Loops, apply family and purrr package.
 ========================================================
 
 Each country `tibble` has `920` columns all in upper case. First, let's turn all the columns into `lowercase`. 
-- The `data` column is a list, so we can `map` through that list, change the column names to lower case and return the new data frame.
+- The `data` column is a list, so we can `map` through that list, change the column names to lower case and return the new data frame
 - We will obtain a list containing each tibble with the lowercase column names and replace the existing `data` column.
 
 
@@ -1110,12 +1091,35 @@ student_nested %>%
 # ... with 59 more rows
 ```
 
+Very easy!! Just go to the next slide.
+
+Loops, apply family and purrr package.
+========================================================
+
+Wait! What did you just do?
+- Remember `data` is a list containing a tibble for each country, so loop through each of these.
+- `country_tibble` is just the name of the only argument of our `anonymous function`.
+- The `anonymous function` changes the names of the tibble and then returns the tibble.
+- So in each loop we will change the column names and then return the updated column.
+
+
+```r
+map(data, function(country_tibble) {
+    names(country_tibble) <- tolower(names(country_tibble))
+    country_tibble
+})
+```
+
+Because this will return a _list_ with each object being a tibble, we simply replaced the `data` column with this updated lowercase name tibble!
+
+See? Once we understand it, it makes sense.
+
 Loops, apply family and purrr package.
 ========================================================
 
 Now, we don't want to have `920` columns per country. Let's only select `pv1math`, `misced`, and `st004d01t` (Mathematics score, Father's education and Gender.) You can do that very easily.
 
-Copy the previous code and inside our `anonymous function` (remember, the function created on the spot that doesn't have a name) ...
+Copy the previous code that has the `mutate` function and inside our `anonymous function` (remember, the function created on the spot that doesn't have a name) ...
 
 - pipe the last line to `rename` and change the name of the variables to `math`, `father_edu` and `gender`. Remember, the new name comes _before_ the `=` sign
 - pipe the result to `select` and pick the three variables
@@ -1134,30 +1138,26 @@ Loops, apply family and purrr package.
     country_tibble %>%
       rename(math = pv1math, father_edu = misced, gender = st004d01t) %>%
       select(math, father_edu, gender)
-})))
+}))) %>%
+  head(6)
 ```
 
 ```
-# A tibble: 69 × 2
-                    CNT               data
-                  <chr>             <list>
-1   Trinidad and Tobago  <tibble [84 × 3]>
-2  United Arab Emirates <tibble [270 × 3]>
-3            Luxembourg  <tibble [95 × 3]>
-4                Turkey  <tibble [98 × 3]>
-5                Latvia  <tibble [93 × 3]>
-6                Brazil <tibble [406 × 3]>
-7               Finland <tibble [119 × 3]>
-8               Tunisia  <tibble [92 × 3]>
-9    Russian Federation <tibble [125 × 3]>
-10       Czech Republic <tibble [126 × 3]>
-# ... with 59 more rows
+# A tibble: 6 × 2
+                   CNT               data
+                 <chr>             <list>
+1  Trinidad and Tobago  <tibble [84 × 3]>
+2 United Arab Emirates <tibble [270 × 3]>
+3           Luxembourg  <tibble [95 × 3]>
+4               Turkey  <tibble [98 × 3]>
+5               Latvia  <tibble [93 × 3]>
+6               Brazil <tibble [406 × 3]>
 ```
 
 Loops, apply family and purrr package.
 ========================================================
 
-Look at how clean is our workflow. One single data frame encapsulating all the changes.
+Look at how clean our workflow is. One single data frame encapsulating all the changes.
 
 Once we're here we can do really cool stuff with the `map` family. How could we calculate the mean `math` score for each country?
 
@@ -1188,7 +1188,7 @@ student_nested$data %>%
 [64] 498.9575 486.9804 440.7252 471.0188 363.6423 323.0348
 ```
 
-Those are the means of each specific country but we can't tease out which belongs to who.
+Those are the means of each specific country but we can't tease out which belongs to which.
 
 Loops, apply family and purrr package.
 ========================================================
@@ -1229,9 +1229,10 @@ Loops, apply family and purrr package.
 ========================================================
 Let's do that.
 
-- Create two new columns (with the same structure as `mean_math`) one named `lower_bound` and the other named `upper_bound`.
-- In both columns you'll simply use `our_ci` instead of mean.
-- But remember that the output of `our_ci` are two numbers (first lower then upper), so for the `lower_bound` variable you'll need to subset the first argument and the second for the `upper_bound` variable.
+- Create two new columns (with the same structure as `mean_math` column) one named `lower_bound` and the other named `upper_bound`.
+- In both columns you'll simply use `our_ci` instead of `mean` function.
+- But remember that the output of `our_ci` are two numbers (first lower then upper bounds), so for the `lower_bound` variable you'll need to run the same thing but subset the first object;
+- For the upper variable you'll need to run exactly the same thing but subset the second object.
 
 Loops, apply family and purrr package.
 ========================================================
@@ -1262,14 +1263,13 @@ student_nested %>%
 # ... with 59 more rows, and 1 more variables: upper_bound <dbl>
 ```
 
-Alright, let's start to wrap things up. Let's talk about how to incorporate statistical modeling together with the tidyverse.
+Alright, let's start to wrap things up. Let's talk about how to incorporate statistical modeling together with the `tidyverse`.
 
 Loops, apply family and purrr package.
 ========================================================
-The function to compute linear modeling is `lm` and the workflow is the same if you're using the pipe.
+The function to compute linear modeling in R is `lm`.
 
 Think about this code:
-
 
 ```r
 student_nested %>%
@@ -1292,6 +1292,10 @@ student_nested %>%
 10       Czech Republic <tibble [126 × 3]> <S3: lm>
 # ... with 59 more rows
 ```
+
+Try to understand it:
+- I'm looping through each dataset and calculating a linear model
+- The output will be a list, so we save it with a name `lm_model`
 
 Loops, apply family and purrr package.
 ========================================================
@@ -1319,31 +1323,26 @@ Loops, apply family and purrr package.
 ```r
 library(broom)
 
-student_nested %>%
+(student_lm <-
+  student_nested %>%
   mutate(lm = map(data, function(country_data)
-    tidy(lm(math ~ father_edu + gender, data=country_data))))
+    tidy(lm(math ~ father_edu + gender, data=country_data))))) %>%
+  head(5)
 ```
 
 ```
-# A tibble: 69 × 3
-                    CNT               data                   lm
-                  <chr>             <list>               <list>
-1   Trinidad and Tobago  <tibble [84 × 3]> <data.frame [3 × 5]>
-2  United Arab Emirates <tibble [270 × 3]> <data.frame [3 × 5]>
-3            Luxembourg  <tibble [95 × 3]> <data.frame [3 × 5]>
-4                Turkey  <tibble [98 × 3]> <data.frame [3 × 5]>
-5                Latvia  <tibble [93 × 3]> <data.frame [3 × 5]>
-6                Brazil <tibble [406 × 3]> <data.frame [3 × 5]>
-7               Finland <tibble [119 × 3]> <data.frame [3 × 5]>
-8               Tunisia  <tibble [92 × 3]> <data.frame [3 × 5]>
-9    Russian Federation <tibble [125 × 3]> <data.frame [3 × 5]>
-10       Czech Republic <tibble [126 × 3]> <data.frame [3 × 5]>
-# ... with 59 more rows
+# A tibble: 5 × 3
+                   CNT               data                   lm
+                 <chr>             <list>               <list>
+1  Trinidad and Tobago  <tibble [84 × 3]> <data.frame [3 × 5]>
+2 United Arab Emirates <tibble [270 × 3]> <data.frame [3 × 5]>
+3           Luxembourg  <tibble [95 × 3]> <data.frame [3 × 5]>
+4               Turkey  <tibble [98 × 3]> <data.frame [3 × 5]>
+5               Latvia  <tibble [93 × 3]> <data.frame [3 × 5]>
 ```
+Don't feel intimidated by all this code. We're doing the same thing as before but wrapping each `lm` output with `tidy`. `tidy` turns that into a data frame.
 
-Now we have a data frame of the regression output for each country! We can do so many things:
-- Compare slopes between countries
-- Compare `R2` between countries by s
+Now we have a data frame of the regression output for each country!
 
 Loops, apply family and purrr package.
 ========================================================
@@ -1352,9 +1351,7 @@ To finish, we `unnest` the `lm` column to compare slopes.
 
 ```r
 (student_lm <-
-  student_nested %>%
-  mutate(
-    lm = map(data, function(country_data) tidy(lm(math ~ father_edu + gender, data=country_data)))) %>%
+  student_lm %>%
   unnest(lm))
 ```
 
@@ -1388,7 +1385,7 @@ student_lm %>%
   coord_flip()
 ```
 
-<img src="fourth_seminar-figure/unnamed-chunk-60-1.png" title="plot of chunk unnamed-chunk-60" alt="plot of chunk unnamed-chunk-60" style="display: block; margin: auto;" />
+<img src="fourth_seminar-figure/unnamed-chunk-62-1.png" title="plot of chunk unnamed-chunk-62" alt="plot of chunk unnamed-chunk-62" style="display: block; margin: auto;" />
 
 Loops, apply family and purrr package.
 ========================================================
@@ -1408,9 +1405,9 @@ ggplot(student, aes(x = FISCED, y = PV1MATH)) +
   facet_wrap(~ CNT)
 ```
 
-<img src="fourth_seminar-figure/unnamed-chunk-61-1.png" title="plot of chunk unnamed-chunk-61" alt="plot of chunk unnamed-chunk-61" style="display: block; margin: auto;" />
+<img src="fourth_seminar-figure/unnamed-chunk-63-1.png" title="plot of chunk unnamed-chunk-63" alt="plot of chunk unnamed-chunk-63" style="display: block; margin: auto;" />
 
-Loops, apply family and purrr package.
+Conclusions.
 ========================================================
 
 Some pointers:
