@@ -7,6 +7,7 @@
 # For this exercise, these are some of the things you'll be using:
 
 library(tidyverse) # For all tidyverse packages
+library(broom) # For the glance function
 
 # For performing loops
 map(.x, .f, ...)
@@ -34,16 +35,14 @@ your_function_name <- function(x, y, z, etc..) {
 # the name bad_drivers.
 
 url <- "https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/third_seminar/data/bad_drivers.csv"
-bad_drivers <- read_csv(url, )
 
-#2. Really quickly, to get familiarized with the data, we want to calculate the mean of each
+# 2. Really quickly, to get familiarized with the data, we want to calculate the mean of each
 # numeric column. We can do that by specify bad_drivers as the first argument and mean as the function.
 # Two caveats: not all variables are numeric and I want the result to be a numeric vector instead
 # of a list. 
 
 # Note: your result shouldn't produce any warnings
 
-map_dbl(bad_drivers[-1], mean)
 
 # 3. 
 states <- setNames(state.region, state.name)
@@ -72,14 +71,6 @@ if (this condition is TRUE) {
   execuse this
 }
 
-fac_to_character <- function(x) {
-  if (is.factor(x)) {
-    as.character(x)
-  } else {
-    x
-  }
-}
-
 # Test your function with this code:
 is.character(fac_to_character(bad_drivers$state))
 is.character(fac_to_character(bad_drivers$region))
@@ -91,7 +82,6 @@ is.character(fac_to_character(bad_drivers$region))
 # column and apply your newly created function fac_to_character. Save the results to bad_drivers_upd.
 # The output should be the same data frame but with no factor variables.
 
-bad_drivers_upd <- map_df(bad_drivers, fac_to_character)
 
 # 6.
 # Quickly, how can we programatically check how many factors we have in our data frame?
@@ -100,9 +90,51 @@ bad_drivers_upd <- map_df(bad_drivers, fac_to_character)
 # can you predict the length and exact contents of our result? This should help you
 # understand how loops work.
 
-map_lgl(bad_drivers_upd, is.factor)
+# You could even wrap your previous expression with table() to get a table of T's and F's. Try it:
 
-# You could even wrap your previous expression with table to get a table of T's and F's. Try it:
 
-table(map_lgl(bad_drivers_upd, is.factor))
+# 7. We want to do a separate regression for of each of the regions to check whether the
+# num_drivers (Number of drivers in fata collisions per billion miles) is explained by
+# perc_speeding and perc_alcohol.
 
+# Let's start by nesting the data into list-columns. Pipe bad_drivers_upd to group_by region.
+# Then use the nest function to nest region data sets into list-value pairs. Look at the ?nest
+# examples to understand how it works.
+
+
+# If you looked at the previous result, the data frame has a row with missing values. We want
+# to exclude those, but we want to do it in an automated way, in case we use another data frame
+# and not only this one. 
+
+# 8.
+# I want you to create a function called is_na_fun() that accepts one argument. Using `stopifnot()`
+# function check that the data frame is a data frame (is.data.frame()).
+
+# In the body of the function, using is.na(), which() and the `-` sign, delete
+# the rows that have any NA's. This might be hard, but think of it like this:
+# Take df, open brackets, which are NA's in df? deleted it and keep al columns.
+
+# 9.
+# Using the previous pipeline, after nest(), add your own `is_na_fun()` to the pipeline
+# See how it works?! You can create your own functions and customize the pipeline.
+# Now pipe that to mutate to create a new column called `lm_model`. This column
+# will use `map()` to loop over the data column (which is a list) and will run
+# a linear regression using this command `lm(num_drivers ~ perc_speeding + perc_alcohol, data = your_data)`.
+# Remember, you'll need to create an `anonymous function` and pass your argument to the data argument!
+
+# You should have something similar to this (piped to the previous expression):
+
+mutate(var_name = map(your_column, function() lm(num_drivers ~ perc_speeding + perc_alcohol, data = your_data)))
+
+# BEFORE DOING THIS, try to predict what the outcome will be based on the previous line.
+
+
+# Once you have it done, I want you to wrap the `lm` expression in a function called `glance()` which
+# will give you the diagnostics of the model, such as R2, Pvals, and so on..
+
+
+# To wrap it up, pipe the previous pipeline to unnest() and unnest the lm_model function.
+# Pipe that to select and choose only variables region and r.squared.
+
+
+# Awesome! That was a real data analysis workflow there.
