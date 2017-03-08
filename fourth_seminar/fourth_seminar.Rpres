@@ -1,7 +1,7 @@
 Automating everything: we should always strive for it!
 ========================================================
-author: Jorge Cimentada  
-date: 9th of March 2017  
+author: Jorge Cimentada
+date: 9th of March 2017
 class: illustration
 font-family: 'Helvetica'
 width: 1800
@@ -26,12 +26,12 @@ adds_1 <- function(my_number) {
 
 adds_1(5)
 ```
-  
-- You need to pick a _name_ for the function  
 
-- You list the inputs or _arguments_ inside the blue function  
+- You need to pick a _name_ for the function
 
-- You place the code you have developed in _body_ of the function  
+- You list the inputs or _arguments_ inside the blue function
+
+- You place the code you have developed in _body_ of the function
 
 #### When should you write a function?
 Write a function whenever you’ve copied and pasted a block of code more than twice.
@@ -54,21 +54,24 @@ What is the result of this function call?
 Functions in R
 ========================================================
 
-There are a couple of rules that you need to follow when creating functions.
+You can think of functions like little factories: Every factory takes some inputs, and returns an output (its product).
 
-- Everything that happens inside a function (almost) always stays inside a function
+- They take some inputs (function arguments) and return an output.
+
+- They are black boxes. From the outside, nobody knows what goes on inside the factory.
 
 ```{r, fig.width = 7, fig.height = 5}
-random_num_generator <- function() {
-  x <- rnorm(100)
-  y <- rnorm(100)
+random_num_generator <- function(n) {
+  x <- rnorm(n)
+  y <- rnorm(n)
   plot(x, y)
 }
 
-random_num_generator()
+random_num_generator(100)
 ```
 
 Run this and try searching for `x` or `y` inside your working directory.
+
 
 Functions in R
 ========================================================
@@ -91,134 +94,101 @@ function_env()
 Functions in R
 ========================================================
 
-Functions created in an interactive R session are stored by default in the `Global Environment`.
+Let's create a function that calculates the variance of a vector x:
 
-```{r}
-our_useless_fun <- function() {
-  "Our random function"
-}
-environment(our_useless_fun)
-```
+<div align="center">
+<img src="./figures/variance.png" width=2000 height=350>
+</div>
 
-How can you tell whether something is a function?
 
-```{r}
-class(our_useless_fun)
-class(our_useless_fun())
-```
+Clearly there are three steps to calculating this formula:
 
-Functions in R
-========================================================
-*Name masking*
+- Calculate the deviance
+- Correct the sample size to make the estimator unbiased
+- Divide the deviance by the corrected sample size
 
-Remember this function?
-```{r}
-random_num_generator <- function() {
-  x <- rnorm(100)
-  y <- rnorm(100)
-  plot(x, y)
-}
-```
-
-- The function will search for `x` and `y` inside the functions environment
-- If it doesn't find it, it will look for the function in the next environment _higher_ up.
 
 Functions in R
 ========================================================
 
-```{r, fig.align = 'center'}
+- Create a vector called `x` which has `rnorm(100)` inside. With this we'll generate `100` random numbers with a normal distribution.
+
+- Find the mean of the vector x with `mean(x)`
+
+- Let's subtract each `x` from the `mean(x)`. This will give us the deviations from the overall mean.
+
+- How can we subtract a single number from every element of a vector?
+
+Functions in R
+========================================================
+### Answer:
+
+```{r}
+set.seed(1)
 x <- rnorm(100)
-random_num_generator <- function() {
-  y <- rnorm(100)
-  plot(x, y)
-}
-random_num_generator()
+mu <- mean(x)
+x - mu
 ```
 
-### How is the function searching for the variables?
-
-Functions in R
-========================================================
-Even harder:
-```{r, eval = F}
-set.seed(1)
-random_num_generator <- function() { 
-  x <- rnorm(100)
-  
-  function() {
-  y <- rnorm(100)
-  plot(x, y)
-  }
-}
-
-m <- random_num_generator()
-m()
-```
-
-- Do we get an error?
-- Whats the output like?
-- Try to visualize it as boxes within boxes within boxes
+- What does `x - mu` give us? A scalar or a vector?
+- How can we sqare every element of a vector?
+- How can we sum the elements of a vector?
 
 Functions in R
 ========================================================
 
-Try this one:
+Understanding the "environments" from before is key to writing code with fewer bugs: the simpler the environment, the fewer things can go wrong.
 
-```{r, eval = F}
-set.seed(1)
-random_num_generator <- function() { 
-  x <- rnorm(100)
-  
-  function() {
-  y <- rnorm(100)
-  }
-  
-  plot(x, y)
-}
+Let's create a simple function with a simple environment that calculates the deviance:
 
-random_num_generator()
-```
-
-- Do we get an error?
-- Whats the output like?
-
-Functions in R
-========================================================
-
-Try this one:
-
-```{r, eval = F}
-set.seed(1)
-random_num_generator <- function() { 
-  x <- rnorm(100)
-  y <- rnorm(100)
-  
-  our_plot <- function() {
-  plot(x, y)
-  }
-  
-  our_plot()
-}
-
-random_num_generator()
-```
-
-- Do we get an error?
-- Whats the output like?
-
-Functions in R
-========================================================
-
-Some simple rules:
-
-- Functions will look for the required input _inside_ their environment.
-- If they don't find it, they'll search in the _parent environment_.
-- If they can't find it, they'll search in the _parent environment_ of the _parent environment_.
-
-How do we we know which is parent of who?
 ```{r}
-search()
+deviance_sq <- function (x) {
+    mu <- mean(x) # create an intermediate variable `mu`
+    sum((x - mu)^2) # use mu to calculate the deviance
+}
 ```
+
+- The Inputs are called arguments. In this case we take one (x).
+- The Output is called the "return value". R will return the value of the last line of the function.
+- Here the environment of our functions has two variables, the input "x", and an intermediate value "mu".
+
+
+Functions in R
+========================================================
+
+Simpler environments have fewer intermediate variables. Maybe we can try removing one intermediate variable to make the environment inside our function simpler:
+
+```{r}
+mu <- mean(x)
+deviance_sq <- function (x) {
+    sum((x - mu)^2)
+}
+```
+
+What is happening here???
+
+- The function body demands a variable `mu`. R will first search for `mu` inside the functions environment.
+- If it doesn't find it there, it will look for the function in the next environment _higher_ up.
+- Did we improve our code?
+
+
+Functions in R
+========================================================
+
+```{r}
+deviance_sq(c(1,2,3))
+
+mu <- 2000
+
+deviance_sq(c(1,2,3))
+```
+
+We can no longer rely on deviance_sq to give the correct deviance to our data!
+
+- Functions which only demand variables from their own environment (only rely on their inputs) are called _pure_ functions.
+- Tidyverse functions are almost always pure!
+- We want our functions to have simple environments, but we also want them to be pure.
+
 
 Functions in R
 ========================================================
@@ -241,197 +211,121 @@ random_num_generator <- function() {
 
 It will search the environment of the function and look for `our_plot` and `rnorm`, if not found, it will look in the _parent environment_ and so on..
 
+
 Functions in R
 ========================================================
-Another rule:
-- Everything created in a function gets deleted after the function ends.
 
-_Run this twice_
-```{r, eval = F}
-j <- function() {
-  if (!exists("a")) {
-    a <- 1
-  } else {
-    a <- a + 1
+This too can be dangerous:
+
+```{r}
+deviance_sq <- function (x) {
+    mu <- mean(x)
+    sum((x - mu)^2)
+}
+
+deviance_sq(c(1,2,3))
+
+mean <- function (y) {
+     y*5000000
+}
+
+deviance_sq(c(1,2,3))
+```
+
+- We admit that most of our functions will rely on other functions.
+
+- We need to be careful when choosing function names!
+
+
+Functions in R
+========================================================
+
+Like most things we do, calculating the variance involves multiple stpes. Each step is full of opportunities for bugs. If we create a pure function for every step, we can test each step, and rely on each step working.
+
+Let's write our steps in comments.
+
+
+```{r}
+our_variance <- function(x) {
+    # Calculate the deviance
+    # Correct the sample size to make the estimator unbiased
+    # Divide the deviance by the corrected sample size
+}
+```
+
+Functions in R
+========================================================
+
+We already created a a function to calculate the deviance, so let's create a function that gives us the corrected sample size:
+
+
+```{r}
+unbiased_size <- function(x) length(x) - 1
+```
+
+- Notice we can ommit the {} if the function is only one line!
+
+Let's test this to make sure we get what we expect:
+
+```{r}
+unbiased_size(c(1,2,3,4,5))
+unbiased_size(c(1))
+```
+
+- Is the last example going to cause a problem for us???
+
+
+Functions in R
+========================================================
+
+Clearly we can't have our unbiased size function return 0's. Let's make the function return a minimum of 1, always. How can we do that?
+
+- We learned that a function returns the last line.
+
+- We can use `return()` to return a value from the middle of the function!
+
+- This allows us to create a function that returns different things based on the input:
+
+
+```{r}
+unbiased_size <- function(x) {
+  if (length(x) <= 1) {
+    return(1)
   }
-  a
+  length(x) - 1
 }
 
-j()
-j()
+unbiased_size(c(1,2))
+unbiased_size(c(1))
 ```
-
-```{r, echo = F}
-rm(j)
-```
-Example taken from: http://adv-r.had.co.nz/Functions.html
 
 Functions in R
 ========================================================
-Finally, a function *always* returns the last line of code unless specified otherwise.
+
+Great! Now we have a function to compute deviance and one to correct the size of our sample. Let's see what we have left:
 
 ```{r}
-my_fun <- function(x) {
-  "Hey, should I be the output?"
-  rnorm(x)
+our_variance <- function(x) {
+    # Divide the deviance by the corrected sample size
 }
-
-my_fun(10)
 ```
 
-Functions in R
-========================================================
-A function always returns the last line, even if the last line doesn't return anything!
-
-```{r}
-my_fun <- function(x) {
-  rnorm(x)
-  y <- x
-}
-
-my_fun(10)
-```
-
-Functions in R
-========================================================
-But we do get something in return, but remember that the `<-` operator doesn't print the results.
-
-This way we can see the return of the function:
-```{r}
-print(my_fun(10))
-```
-
-What if we want to return some value from the middle of the function?
-
-Functions in R
-========================================================
-
-We use the function `return()`
-
-```{r}
-our_range <- function(x) {
-  if (length(x) == 1) {
-    return(x)
-  }
-  print("If the input is longer than 1, This should print!")
-  c(min(x), max(x))
-}
-
-our_range(1:10)
-our_range(5)
-```
-
-When `return()` is used, the function only runs until `return()`.
-
-Functions in R
-========================================================
-
-Let's get some practice. This is how you calculate the variance of a series of numbers. 
-
-<div align="center">
-<img src="./figures/variance.png" width=2000 height=350>
-</div>  
-  
-### Let's start with everything inside the parethesis of the numerator
-
-Functions in R
-========================================================
-
-- Create a vector called `x` which has `rnorm(100)` inside. With this we'll generate `100` random numbers with a normal distribution.  
-
-- Let's subtract each `x` from the `mean(x)`. This will give us the deviations from the overall mean.  
-
-- Understand the contents of `x - mean(x)`
+- We need a function that divides a number by another number.
+- We don't need to create this ourselves because R already has it!
+- Let's finish our_variance using `deviance_sq` and `unbiased_size`!
 
 Functions in R
 ========================================================
 ### Answer:
 
 ```{r}
-set.seed(1)
-x <- rnorm(100)
-x - mean(x)
-```
-
-- Wrap `x - mean(x)` in parenthesis and raise it to the second power (`^2`)
-- Wrap the previous expression with `sum()` to get the sum of squared deviations.
-- Save that expression with the name `deviance_sq`.
-
-Functions in R
-========================================================
-#### Answer:
-
-```{r}
-deviance_sq <- sum((x - mean(x)) ^ 2)
-```
-
-We have the numerator done! Let's finish the denominator.
-
-- Take the `length()` of `x` minus `1` and save it with a name `denominator`.
-
-Functions in R
-========================================================
-#### Answer:
-
-```{r}
-denominator <- length(x) - 1
-```
-
-Let's finish the formula by dividing `deviance_seq` by the `denominator`.
-
-Functions in R
-========================================================
-### Answer:
-
-```{r}
-our_result <- deviance_sq / denominator
+our_variance <- function (x) deviance_sq(x) / unbiased_size(x)
 ```
 
 Let's confirm that our results are correct:
 
 ```{r}
-c(our_result = our_result, R_result = var(x))
-```
-
-Functions in R
-========================================================
-
-Now comes the cool part! Lets wrap that into a function.
-
-The skeleton of a function is:
-
-```{r, eval = F}
-your_function_name <- function(your_argument1, your_argument2, etc..) {
-  Body of the function
-}
-```
-
-- Call your function `our_variance`
-_ Set `x` as the first and only argument of the function.
-- Include the calculations of `deviance_sq` and `denominator` in the body of the function
-- Make sure to have `deviance_sq / denominator` as the last line in your function (without saving it to any name)
-
-Functions in R
-========================================================
-### Answer:
-
-```{r}
-our_variance <- function(x) {
-  
-  deviance_sq <- sum((x - mean(x)) ^ 2)
-  pen_length <- length(x) - 1
-  
-  deviance_sq / pen_length
-}
-```
-
-- Save the function by running it either the console or in the script.
-- Try it out!
- 
-```{r}
-set.seed(2)
-x <- rnorm(100)
-our_variance(x); var(x)
+c(our_result = our_variance(x), R_result = var(x))
 ```
 
 Functions in R
@@ -442,7 +336,7 @@ Now, this is the formula for the standard deviation:
 
 <div align="center">
 <img src="./figures/standard_dev.png" width=1500 height=600>
-</div>  
+</div>
 
 ## Comparing this to the variance formula, how is this different?
 
@@ -470,7 +364,20 @@ Let's explain how this works:
 - `x` is passed to `our_variance`, the function returns the variance, and then `sqrt` simply takes the
 square root of the result of `our_variance`.
 
-Let's test it!
+Functions in R
+========================================================
+Remember the "pipe" operator we used with dplyr?
+
+```{r}
+our_sd <- function(x) {
+  our_variance(x) %>% sqrt()
+}
+```
+
+It works with our functions too! We can create an assembly line of small functions and pipe them into each other. We can test each function individually, and have a system that works reliably.
+
+Let's test our new standard deviation function!
+
 
 Functions in R
 ========================================================
@@ -528,7 +435,7 @@ our_ci <- function(x, ci_level = 0.95) {
   # Z value calculation
   a <- (1 - ci_level) / 2
   z_value <- qnorm(1 - a)
-  
+
   # Confidence interval calcuation
   lower_ci <- mean(x) -  (z_value * our_sd(x)) # See using our_sd function which uses our_variance
   upper_ci <- mean(x) +  (z_value * our_sd(x))
@@ -548,7 +455,7 @@ our_ci <- function(x, ci_level = 0.95) {
   # Confidence interval calcuation
   lower_ci <- mean(x) -  (z_value * our_sd(x)) # See using our_sd function which uses our_variance
   upper_ci <- mean(x) +  (z_value * our_sd(x))
-  
+
   c(lower_bound = lower_ci, upper_bound = upper_ci)
 }
 ```
@@ -603,7 +510,7 @@ ci_values <- seq(0.50, 0.90, 0.10)
 n <- length(ci_values)
 
 for () {
-  
+
 }
 ```
 
@@ -637,7 +544,7 @@ Loops, apply family and purrr package.
 ========================================================
 
 ## Result:
-  
+
 ```{r}
 ci_values <- seq(0.50, 0.90, 0.10)
 n <- length(ci_values)
@@ -795,7 +702,7 @@ This is VERY powerful.. look at the simpleness of this `tibble`.
 Loops, apply family and purrr package.
 ========================================================
 
-Each country `tibble` has `920` columns all in upper case. First, let's turn all the columns into `lowercase`. 
+Each country `tibble` has `920` columns all in upper case. First, let's turn all the columns into `lowercase`.
 - The `data` column is a list, so we can `map` through that list, change the column names to lower case and return the new data frame
 - We will obtain a list containing each tibble with the lowercase column names and replace the existing `data` column.
 
@@ -848,7 +755,7 @@ Loops, apply family and purrr package.
   student_nested %>%
   mutate(data = map(data, function(country_tibble) {
     names(country_tibble) <- tolower(names(country_tibble))
-    
+
     country_tibble %>%
       rename(math = pv1math, father_edu = misced, gender = st004d01t) %>%
       select(math, father_edu, gender)
@@ -885,7 +792,7 @@ Let's turn the previous result into a column of `student_nested`.
 - Pipe `student_nested` to `mutate` and create a new variable called `mean_math`.
 - Inside `mean_math` specify `map_dbl` as the function and the column `data` as the first argument of `map_dbl`.
 - Finally, copy the `anonymous function` from before as the function argument of `map_dbl`.
-  
+
 Loops, apply family and purrr package.
 ========================================================
 ```{r}
@@ -1005,13 +912,13 @@ Conclusions.
 
 Some pointers:
 
-- Everytime you write a code more than two or three times, think about how to turn it into a function  
+- Everytime you write a code more than two or three times, think about how to turn it into a function
 
-- Functions are not only for statistical analysis but for ANYTHING you can think of automating(data wrangling, plots, custom made calculations)  
+- Functions are not only for statistical analysis but for ANYTHING you can think of automating(data wrangling, plots, custom made calculations)
 
-- Whenever you're repeating a function many times (and only changing one thing), considering using the `map` family  
+- Whenever you're repeating a function many times (and only changing one thing), considering using the `map` family
 
-- The benefits are obvious: less code, more readable and more compact  
+- The benefits are obvious: less code, more readable and more compact
 
 - Write, write and write functions and loops (either `apply` or `map`)
 
