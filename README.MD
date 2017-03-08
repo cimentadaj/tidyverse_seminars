@@ -31,7 +31,7 @@ We intend to make all seminars as interactive as possible. For that, we plan to 
 **Seminar 1. Data Exploration**  
 **Instructor: Jorge Cimentada**  
 
-Link to slides  
+[Link to slides](https://cimentadaj.github.io/tidyverse_seminars/first_seminar/first_seminar.html#/)  
 [R exercises](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/first_seminar/first_seminar_exercises.R)  
 [R exercise answers](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/first_seminar/first_seminar_exercises_answers.R)  
 
@@ -46,7 +46,7 @@ Link to slides
 **Seminar 2. Data cleaning made easy**  
 **Instructor: Jorge Cimentada**  
 
-Link to slides  
+[Link to slides](https://cimentadaj.github.io/tidyverse_seminars/second_seminar/second_seminar.html#/)  
 [R exercises](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/second_seminar/second_seminar_exercises.R)  
 [R exercise answers](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/second_seminar/second_seminar_exercisesanswers.R)  
 
@@ -60,7 +60,7 @@ Link to slides
 **Seminar 3. ggplot2: The grammar of graphics**  
 **Instructor: Jorge Cimentada**  
 
-Link to slides  
+[Link to slides](https://cimentadaj.github.io/tidyverse_seminars/third_seminar/third_seminar.html#/)
 [R exercises](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/third_seminar/third_seminar_exercises.R)  
 [R exercise answers](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/third_seminar/third_seminar_exercisessolutions.R)  
 
@@ -75,7 +75,7 @@ Link to slides
 **Seminar 4. Automating everything: we should always strive for it!**  
 **Instructor: Jorge Cimentada**  
 
-Link to slides  
+[Link to slides](https://cimentadaj.github.io/tidyverse_seminars/fourth_seminar/fourth_seminar.html#/)  
 R exercises  
 R exercise answers  
 
