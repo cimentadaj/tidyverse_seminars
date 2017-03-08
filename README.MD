@@ -76,8 +76,8 @@ We intend to make all seminars as interactive as possible. For that, we plan to 
 **Instructor: Jorge Cimentada**  
 
 [Link to slides](https://cimentadaj.github.io/tidyverse_seminars/fourth_seminar/fourth_seminar.html#/)  
-R exercises  
-R exercise answers  
+[R exercises](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/fourth_seminar/fourth_seminar_exercises.R)  
+[R exercise answers](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/fourth_seminar/fourth_seminar_exercisesanswers.R)  
 
 - A subtle introduction to loops and the apply family.  
 - Our first function  
