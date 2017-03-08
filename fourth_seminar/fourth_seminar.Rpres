@@ -31,7 +31,7 @@ adds_1(5)
 
 - You list the inputs or _arguments_ inside the blue function
 
-- You place the code you have developed in _body_ of the function
+- You place the code you have developed in the _body_ of the function
 
 #### When should you write a function?
 Write a function whenever you’ve copied and pasted a block of code more than twice.
@@ -60,7 +60,7 @@ You can think of functions like little factories: Every factory takes some input
 
 - They are black boxes. From the outside, nobody knows what goes on inside the factory.
 
-```{r, fig.width = 7, fig.height = 5}
+```{r, fig.width = 7, fig.height = 3}
 random_num_generator <- function(n) {
   x <- rnorm(n)
   y <- rnorm(n)
@@ -89,7 +89,7 @@ function_env <- function() environment()
 function_env()
 ```
 
-## Think of environments as boxes that contain objects such as functions and vectors. Inside functions, this box is created when function runs and deleted when the function ends.
+## Think of environments as boxes that contain objects such as functions and vectors. Inside a function, this box is created when the function runs and deleted when the function ends.
 
 Functions in R
 ========================================================
@@ -125,13 +125,14 @@ Functions in R
 
 ```{r}
 set.seed(1)
+
 x <- rnorm(100)
 mu <- mean(x)
 x - mu
 ```
 
 - What does `x - mu` give us? A scalar or a vector?
-- How can we sqare every element of a vector?
+- How can we square every element of a vector?
 - How can we sum the elements of a vector?
 
 Functions in R
@@ -148,8 +149,8 @@ deviance_sq <- function (x) {
 }
 ```
 
-- The Inputs are called arguments. In this case we take one (x).
-- The Output is called the "return value". R will return the value of the last line of the function.
+- The inputs are called arguments. In this case we take one (x).
+- The output is called the "return value". R will return the value of the last line of the function.
 - Here the environment of our functions has two variables, the input "x", and an intermediate value "mu".
 
 
@@ -222,30 +223,30 @@ deviance_sq <- function (x) {
     mu <- mean(x)
     sum((x - mu)^2)
 }
-
 deviance_sq(c(1,2,3))
 
 mean <- function (y) {
      y*5000000
 }
-
 deviance_sq(c(1,2,3))
 ```
-
 - We admit that most of our functions will rely on other functions.
+- We need to be careful when choosing function names!  
 
-- We need to be careful when choosing function names!
-
+```{r, echo = F}
+rm(mean)
+```
 
 Functions in R
 ========================================================
+Before keeping going, remember to `rm(mean)`
 
-Like most things we do, calculating the variance involves multiple stpes. Each step is full of opportunities for bugs. If we create a pure function for every step, we can test each step, and rely on each step working.
+Like most things we do, calculating the variance involves multiple steps. Each step is full of opportunities for bugs. If we create a pure function for every step, we can test each step, and rely on each step working.
 
 Let's write our steps in comments.
 
 
-```{r}
+```{r, eval = F}
 our_variance <- function(x) {
     # Calculate the deviance
     # Correct the sample size to make the estimator unbiased
@@ -263,7 +264,7 @@ We already created a a function to calculate the deviance, so let's create a fun
 unbiased_size <- function(x) length(x) - 1
 ```
 
-- Notice we can ommit the {} if the function is only one line!
+- Notice we can ommit the `{}` if the function is only one line!
 
 Let's test this to make sure we get what we expect:
 
@@ -294,17 +295,19 @@ unbiased_size <- function(x) {
   }
   length(x) - 1
 }
-
+```
+```{r, eval = F}
 unbiased_size(c(1,2))
 unbiased_size(c(1))
 ```
+Without running the function, predict the result of both calls..
 
 Functions in R
 ========================================================
 
 Great! Now we have a function to compute deviance and one to correct the size of our sample. Let's see what we have left:
 
-```{r}
+```{r, eval = F}
 our_variance <- function(x) {
     # Divide the deviance by the corrected sample size
 }
@@ -312,12 +315,13 @@ our_variance <- function(x) {
 
 - We need a function that divides a number by another number.
 - We don't need to create this ourselves because R already has it!
-- Let's finish our_variance using `deviance_sq` and `unbiased_size`!
+- You finish `our_variance` function by dividing `deviance_sq()` over `unbiased_size()`.
+- Remember we will only use one argument.
 
 Functions in R
 ========================================================
 ### Answer:
-
+ 
 ```{r}
 our_variance <- function (x) deviance_sq(x) / unbiased_size(x)
 ```
@@ -369,6 +373,7 @@ Functions in R
 Remember the "pipe" operator we used with dplyr?
 
 ```{r}
+library(dplyr)
 our_sd <- function(x) {
   our_variance(x) %>% sqrt()
 }
