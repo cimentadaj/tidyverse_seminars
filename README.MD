@@ -60,7 +60,7 @@ We intend to make all seminars as interactive as possible. For that, we plan to 
 **Seminar 3. ggplot2: The grammar of graphics**  
 **Instructor: Jorge Cimentada**  
 
-[Link to slides](https://cimentadaj.github.io/tidyverse_seminars/third_seminar/third_seminar.html#/)
+[Link to slides](https://cimentadaj.github.io/tidyverse_seminars/third_seminar/third_seminar.html#/)  
 [R exercises](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/third_seminar/third_seminar_exercises.R)  
 [R exercise answers](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/third_seminar/third_seminar_exercisessolutions.R)  
 
