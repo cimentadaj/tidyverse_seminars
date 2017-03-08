@@ -429,7 +429,7 @@ Now, you complete the work:
 
 - Create a function with the name `our_ci`.
 - This function will have two arguments, one called `x`, and another one called `ci_level` which will have the number `0.95` by default.
-- Paste the previous code inside the function excluding the `x` function and the `ci_level` vector.
+- Paste the code from above inside the function excluding the `x` and ci_level vectors.
 
 Functions in R
 ========================================================
@@ -448,6 +448,7 @@ our_ci <- function(x, ci_level = 0.95) {
 ```
 
 - Using the `c()` function concatenate `lower_ci` and `upper_ci` and paste it as the last line of the function.
+- We wanna make sure the output of our function are the lower and upper bounds in that order.
 
 Functions in R
 ========================================================
@@ -465,9 +466,15 @@ our_ci <- function(x, ci_level = 0.95) {
 }
 ```
 
+Functions in R
+========================================================
+Let's test whether our function returns what we want:
 ```{r}
 age <- rnorm(10^5, mean = 10, sd = 2)
-our_ci(age, ci_level = 0.95); our_ci(age, ci_level = 0.50)
+
+our_ci(age, ci_level = 0.95)
+our_ci(age, ci_level = 0.80)
+our_ci(age, ci_level = 0.50)
 ```
 
 Loops, apply family and purrr package.
@@ -504,7 +511,7 @@ We want to create a loop that calculates the confidence interval of our `x` vari
 
 - Create a vector called `ci_values` which has this sequence of numbers: `seq(0.50, 0.90, 0.10)`. (Check its contents)
 - How long is `ci_values`? Calculate its length with `length()` and save it to the name `n`.
-- Create an empty _loop_  skeleton like the previous one
+- Create an empty _loop_  skeleton based on the previous one
 
 Loops, apply family and purrr package.
 ========================================================
@@ -719,8 +726,6 @@ student_nested %>%
 }))
 ```
 
-Very easy!! Just go to the next slide.
-
 Loops, apply family and purrr package.
 ========================================================
 
@@ -771,7 +776,7 @@ Loops, apply family and purrr package.
 Loops, apply family and purrr package.
 ========================================================
 
-Look at how clean our workflow is. One single data frame encapsulating all the changes.
+Look at how clean our tibble is. One single data frame encapsulating all the changes.
 
 Once we're here we can do really cool stuff with the `map` family. How could we calculate the mean `math` score for each country?
 
@@ -811,7 +816,7 @@ Loops, apply family and purrr package.
 ========================================================
 Let's do that.
 
-- Create two new columns (with the same structure as `mean_math` column) one named `lower_bound` and the other named `upper_bound`.
+- Create two new columns (with the same structure as the `mean_math` column) one named `lower_bound` and the other named `upper_bound`.
 - In both columns you'll simply use `our_ci` instead of `mean` function.
 - But remember that the output of `our_ci` are two numbers (first lower then upper bounds), so for the `lower_bound` variable you'll need to run the same thing but subset the first object;
 - For the upper variable you'll need to run exactly the same thing but subset the second object.
