@@ -1,0 +1,51 @@
+---
+title: "Try"
+author: "Jorge Cimentada"
+date: "March 11, 2017"
+output: html_document
+bibliography
+params:
+  start: !r Sys.Date()
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = F, message = F)
+```
+
+
+Knitr provides almost 60 options that you can use to customize your code chunks. Here we’ll cover the most important chunk options that you’ll use frequently. You can see the full list at http://yihui.name/knitr/options/.
+
+
+eval = FALSE prevents code from being evaluated.
+include = FALSE runs the code, but doesn’t show the code or results in the final document.
+echo = FALSE prevents code, but not the results from appearing in the finished file.
+message = FALSE or warning = FALSE prevents messages or warnings from appearing in the finished file.
+results = 'hide' hides printed output; fig.show = 'hide' hides plots.
+error = TRUE causes the render to continue even if code returns an error.
+cache = T When set, this will save the output of the chunk to a specially named file on disk. On subsequent runs, knitr will check to see if the code has changed, and if it hasn’t, it will reuse the cached results.
+
+```{r, name, echo = F, message = F, warning = F, cache = T, eval = F}
+
+```
+
+
+```{r}
+mtcars
+```
+
+use `purl` to extract source code.
+
+use `kable` to output tables
+use `stargazer` to ouput tables
+
+
+Write code without the ```r ``` wrapper to show how code won't be run.
+comma <- function(x) format(x, digits = 2, big.mark = ",")
+
+
+```{r}
+comma <- function(x) format(x, digits = 2, big.mark = ",")
+print(params$start)
+```
+
+You can use inline code with `r comma(1 - 0.2222222)` option.
