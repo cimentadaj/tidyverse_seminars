@@ -1,0 +1,117 @@
+Making your analysis reproducible
+========================================================
+author: Jorge Cimentada
+date: 16th of March 2017
+class: illustration
+font-family: 'Helvetica'
+width: 1800
+height: 900
+
+```{r, echo = F}
+knitr::opts_chunk$set(
+  fig.align = 'center',
+  fig.width = 10
+)
+```
+ 
+Philosophy of reproducibility
+========================================================
+
+- Reproducible research is about communicating what you have done in your work.
+
+Benefits of reproducibility:
+
+- It would provide greater transparency
+- It would allow others to more easily build on what was done in an analysis
+- It would make it easier to understand what common elements there were across many different data analyses
+- It would make it easier to teach data analysis in a systematic and scalable way
+- It will help you understand what you did before
+
+Source: [here](http://simplystatistics.org/2016/05/13/reproducible-research-language/)
+
+What is Rmarkdown?
+========================================================
+
+In short, Rmarkdown is a package that allows to write text and code in the same document.
+
+Markdown is lightweight markup language with plain text formatting.
+
+Does anyone know Markdown?
+
+R markdown example
+========================================================
+
+[Checkout this example](https://cimentadaj.github.io/tidyverse_seminars/fifth_seminar/presentations/airtime.html)
+
+R markdown example
+========================================================
+
+Let's create our own report.
+
+In the menu:
+File -> New file -> R markdown
+
+R markdown example
+========================================================
+
+[Let's learn some things about Rmarkdown](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/fifth_seminar/fifth_seminar.Rmd)
+
+Also, download the [bibliography file](https://cimentadaj.github.io/tidyverse_seminars/fifth_seminar/bibiliography.bib).
+
+R markdown exercises
+========================================================
+
+Next you have to pick one of the datasets presented here and generate an R markdown that has at least:
+
+- 3 graphs
+- 2 tables (this could be something like a data frame with summarized statistics)
+- Comment on each of these graphs/tables
+- Introduce in-line code when commenting.
+- Divide your document into sections using the `#` operator
+
+
+R markdown exercises
+========================================================
+```{r}
+# install.packages("fivethirtyeight")
+library(fivethirtyeight)
+```
+- `Data: congress_age` has an entry for every member of congress who served at any point during a particular congress between January 1947 and Februrary 2014
+  - What is the average age in congress for every year since 1947? How does this differ by party affiliation?
+  - For every year, which party has the oldest member of congress?
+  - For each state, what is the average Republican and Democratic age?
+ 
+R markdown exercises
+========================================================
+```{r}
+# install.packages("AER")
+library(AER)
+data(GSS7402)
+```
+- `Data: GSS7402` is cross-sectional data for 9120 women taken from every fourth year of the US General Social Survey between 1974 and 2002 to investigate the determinants of fertility.
+  - What is the average number of children per year?
+  - Is there a relationship between number of kids and education? Has it changed over time?
+  - What is the average number of children by ehtnicity? How has this evolved over time?
+
+R markdown exercises
+========================================================
+```{r}
+# install.packages("AER")
+library(AER)
+data(PSID7682)
+```
+- `Data: PSID7682` is a panel data on earnings of 595 individuals for the years 1976–1982, originating from the Panel Study of Income Dynamics.
+  - How has the gender gap in wage evolved over time?
+  - Has there been an increase in the average wage over time?
+  - Is there a correlation (use the `cor` function) between experience and wage? Has this correlation weakeaned or became stronger over time?
+
+========================================================
+
+# Thanks!
+## cimentadaj@gmail.com
+- If you want to be in our mailing list
+- Also, send feedback or want to propose a lecture/seminar
+
+<div align="center">
+<img src="./figures/tidyverse_pkg_stickers.png" width=800 height=530>
+</div>
