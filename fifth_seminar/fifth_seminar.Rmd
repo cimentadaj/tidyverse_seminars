@@ -2,50 +2,213 @@
 title: "Try"
 author: "Jorge Cimentada"
 date: "March 11, 2017"
-output: html_document
-bibliography
+output: 
+    html_document:
+      toc: true
+      toc_float: true
+bibliography: bibliography.bib
 params:
   start: !r Sys.Date()
 ---
 
-```{r setup}
-knitr::opts_chunk$set(echo = F, message = F)
+## Skeleton
+**Rmarkdown Skeleton:**  
+title: "Try"  
+author: "Jorge Cimentada"  
+date: "March 11, 2017"  
+output: html_document
+bibliography: bibliography.bib  
+params:  
+  start: !r Sys.Date()  
+  
+***
+
+## Rmarkdown
+When you open an Rmarkdown document, Rstudio writes the skeleton by default, but you can also add other options. Note that the `title`, `author` and `date` options are standard, regardless of the type of document.
+
+We can specify the type of document we want with the `output` option. We can use `pdf_document`, `word_document`, among other things. See [here](http://rmarkdown.rstudio.com/formats.html) for all available formats. See how I created a link from that word? You can do that by wrapping the word with `[]` and placing the link wrapped in `()` next to it. 
+
+You can set a bibliography argument, if you created a .bib. file. [What is a .bib file?](./bibliography.bib). You can create these citations from Google Scholar automatically.
+
+In short, the benefits of R markdown is that we can write code and text in the same document. I could, for example, explain something about how cars with 4 cylinders have greater miles per gallon that other cars and show this graph:
+
+```{r my_first_chunk, message = F, warning = F, echo = F}
+library(tidyverse)
+
+mtcars %>%
+  ggplot(aes(as.factor(cyl), mpg)) +
+  geom_boxplot()
 ```
 
+The cool thing about this is that avoid pasting the graph to the document: we're generating it everytime we run the Rmarkdown file. Now, if you're looking at the source code of the document, you'll note that the code is wrapped in weird `tildes` and `{}`.
 
-Knitr provides almost 60 options that you can use to customize your code chunks. Here we’ll cover the most important chunk options that you’ll use frequently. You can see the full list at http://yihui.name/knitr/options/.
+## Code chunks
 
+In Rmarkdown everything that is surrounded by:  
 
-eval = FALSE prevents code from being evaluated.
-include = FALSE runs the code, but doesn’t show the code or results in the final document.
-echo = FALSE prevents code, but not the results from appearing in the finished file.
-message = FALSE or warning = FALSE prevents messages or warnings from appearing in the finished file.
-results = 'hide' hides printed output; fig.show = 'hide' hides plots.
-error = TRUE causes the render to continue even if code returns an error.
-cache = T When set, this will save the output of the chunk to a specially named file on disk. On subsequent runs, knitr will check to see if the code has changed, and if it hasn’t, it will reuse the cached results.
+\```{r}
 
-```{r, name, echo = F, message = F, warning = F, cache = T, eval = F}
+\```
+
+is interpreted as code that needs to be executed. These are called `code chunks`. `code chunks` have many options that allow you to customize how the chunk behaves. For example, in the previous example we produced a plot but we hid the code. We can make the code explicit by setting the `echo` function to `T` or simply deleting the `echo` options (because echo is set to `T` by default.)
+
+```{r my_second_chunk, message = F, warning = F, echo = T}
+library(tidyverse)
+
+mtcars %>%
+  ggplot(aes(as.factor(cyl), mpg)) +
+  geom_boxplot()
+```
+
+We can also name chunks to give our code more structure. We place the name right after the `r` option in the `{}` Also note the `message` and `warning` options. As you might've thought, the both these options print/supress messages and warnings (both things that actually happen when loading the `tidyverse`)
+
+`Code chunks` have about 60 options for full customization. The most widely used options are:
+- `eval = FALSE` prevents code from being evaluated.  
+- `include = FALSE` runs the code, but doesn’t show the code or results in the final document.  
+- `echo = FALSE` prevents code, but not the results from appearing in the finished file.  
+- `message = FALSE` or `warning = FALSE` prevents messages or warnings from appearing in the finished file.  
+- `results = 'hide'` hides printed output; `fig.show = 'hide'` hides plots.  
+- `error = TRUE` causes the render to continue even if code returns an error.  
+- `cache = T` When set, this will save the output of the chunk to a specially named file on disk. On subsequent runs, knitr will check to see if the code has changed, and if it hasn’t, it will reuse the cached results.
+
+Here are some examples of all of these options:
+
+Code is not executed (but shown)
+```{r, eval = F}
+mtcars %>%
+  ggplot(aes(as.factor(cyl), mpg)) +
+  geom_boxplot()
+```
+
+***
+
+Code gets executed but neither the code nor the output is shown.
+```{r, include = F}
+mtcars %>%
+  ggplot(aes(as.factor(cyl), mpg)) +
+  geom_boxplot()
+```
+
+***
+
+Code gets evaluated but is not shown.
+```{r, results = 'hide'}
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(n = n())
+```
+
+***
+
+Plot will not be shown, but other output will.
+```{r, fig.show = 'hide'}
+mtcars %>%
+  ggplot(aes(as.factor(cyl), mpg)) +
+  geom_boxplot()
+
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(n = n())
+```
+
+***
+Code chunk will continue, even if there's an error.
+```{r, error = T}
+log("not a number")
+
+mtcars %>%
+  group_by(cyl) %>%
+  summarise(n = n())
+```
+
+***
+
+More importantly, cache will pre-load the code chunk.
+
+```{r, cache = T}
+x <- rnorm(10^8)
+```
+
+This code takes a couple of seconds to execute. You can set \```{r} cache = T ```, so that after the code is executed once, everytime you rerun the Rmarkdown file Rmarkdown will load the file for this chunk and avoid rerunning it.
+
+***
+
+Each `code chunk` can fully customized with each of these options but it's a bit of a hassle to specify the same option for all chunks (imagine you have 100 chunks). You can always set 'global' options that will be applied to each chunk. You can do that this way:
+
+```{r setup, echo = T, eval = F}
+knitr::opts_chunk$set(
+  echo = F,
+  message = F
+  )
 
 ```
 
+Knitr provides almost 60 options that you can use to customize your code chunks. You can see the full list at http://yihui.name/knitr/options/.
 
+# Tables and paragraphs.
+
+This is the first paragraph I'll type. But to generate a second paragraph, the sentence needs to end with two additional spaces.  
+
+This is the second paragraph.  
+
+This is the third paragraph.
+
+***
+
+You can print tables or data frames just as they are. For example
 ```{r}
-mtcars
+head(mtcars)
 ```
 
-use `purl` to extract source code.
+You can also use `kable` function from the `knitr` package. For example:
+```{r}
+knitr::kable(head(mtcars))
+```
 
-use `kable` to output tables
+You can also use the `stargazer` package for creating nicely formatted tables.
 use `stargazer` to ouput tables
 
-
-Write code without the ```r ``` wrapper to show how code won't be run.
-comma <- function(x) format(x, digits = 2, big.mark = ",")
-
-
-```{r}
-comma <- function(x) format(x, digits = 2, big.mark = ",")
-print(params$start)
+```{r, message = F, results = 'asis'}
+# install.packages("stargazer")
+library(stargazer)
+stargazer(mtcars, type = "html")
 ```
 
-You can use inline code with `r comma(1 - 0.2222222)` option.
+***
+Also for regression models.
+
+```{r, results = 'asis'}
+mod1 <- lm(mpg ~ cyl, data = mtcars)
+stargazer(mod1, type = "html")
+```
+
+***
+## Sourcing code
+
+Now, you might be writing code and text at the same time, but for some reason you want to extract all of the code without the text to have a separate code file. You can do that with the `purl` function. For example, since this document is called `fifth_seminar.Rmd`, you could open a new session and write:
+```{r, eval = F}
+purl("directory_to_file/fifth_seminar.Rmd")
+```
+
+You can use inline code. So let's suppose you're describing your data and you want to cite the dimensions and the mean of a column. Our `mtcars` data has `r nrow(mtcars)` rows and `r ncol(mtcars)`. The mean of miles per gallon is `r round(mean(mtcars$mpg), 2)`. You can also perform any operation like `r 1 + 1`.
+
+***
+## Other programming languages
+
+Rmarkdown has also the capacity to run other programming languages. It is very common for R users to be also proficient with `bash`, `python` or `stan`.
+
+Instead of writing `r` in the `{}` you can write either:  
+\```{python}
+\```{bash}
+\```{stan}  
+
+***
+
+# Setting bibliography
+
+Bibligraphy is also really easy. If you set the bibliography file in the skeleton, then you can cite freely. For example:
+
+[@wickham2016] and [@team2000r].  
+@wickham2016 and @team2000r.
+
+# Bibliography
