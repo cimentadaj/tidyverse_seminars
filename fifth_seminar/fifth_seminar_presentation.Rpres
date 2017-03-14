@@ -80,6 +80,8 @@ library(fivethirtyeight)
   - What is the average age in congress for every year since 1947? How does this differ by party affiliation?
   - For every year, which party has the oldest member of congress?
   - For each state, what is the average Republican and Democratic age?
+  
+use `?congress_age` for a descripton of the data/variables
  
 R markdown exercises
 ========================================================
@@ -93,6 +95,8 @@ data(GSS7402)
   - Is there a relationship between number of kids and education? Has it changed over time?
   - What is the average number of children by ehtnicity? How has this evolved over time?
 
+use `?GSS7402` for a descripton of the data/variables
+
 R markdown exercises
 ========================================================
 ```{r}
@@ -103,7 +107,9 @@ data(PSID7682)
 - `Data: PSID7682` is a panel data on earnings of 595 individuals for the years 1976–1982, originating from the Panel Study of Income Dynamics.
   - How has the gender gap in wage evolved over time?
   - Has there been an increase in the average wage over time?
-  - Is there a correlation (use the `cor` function) between experience and wage? Has this correlation weakeaned or became stronger over time?
+  - Is there a correlation (use the `cor` function) between experience and wage? Has this correlation weakeaned or became stronger over time?  
+  
+use `?PSID7682` for a descripton of the data/variables
 
 ========================================================
 
