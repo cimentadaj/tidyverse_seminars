@@ -61,7 +61,7 @@ Also, download the [bibliography file](https://cimentadaj.github.io/tidyverse_se
 R markdown exercises
 ========================================================
 
-Next you have to pick one of the datasets presented here and generate an R markdown that has at least:
+Next you have to pick one of the datasets presented next and generate an R markdown that has at least:
 
 - 3 graphs
 - 2 tables (this could be something like a data frame with summarized statistics)
@@ -111,7 +111,16 @@ data(PSID7682)
   
 use `?PSID7682` for a descripton of the data/variables
 
+Other R markdown options
 ========================================================
+
+- [Books with `bookdown`](http://tidytextmining.com/)
+- [Flexdashboards: Interactive dashboards](https://cimentadaj.github.io/tidyverse_seminars/fifth_seminar/dashboard/dashboard.html)  
+    - To run it on your computer, copy [this](https://raw.githubusercontent.com/cimentadaj/tidyverse_seminars/master/fifth_seminar/dashboard/dashboard.Rmd) on an Rmarkdown and click on knit.
+- Include [ShinyApps](https://cimentadaj.shinyapps.io/shiny/) in your document
+
+========================================================
+
 
 # Thanks!
 ## cimentadaj@gmail.com
