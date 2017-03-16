@@ -88,9 +88,7 @@ We intend to make all seminars as interactive as possible. For that, we plan to 
 **Seminar 5. Making your analysis reproducible**  
 **Instructor: Jorge Cimentada**  
 
-Link to slides  
-R exercises  
-R exercise answers  
+[Link to slides](https://cimentadaj.github.io/tidyverse_seminars/fifth_seminar/fifth_seminar_presentation.html#/)  
 
 - Philosophy of reproducibility  
 - An introduction to Rmarkdown  
