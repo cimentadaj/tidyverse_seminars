@@ -58,6 +58,15 @@ R markdown example
 
 Also, download the [bibliography file](https://cimentadaj.github.io/tidyverse_seminars/fifth_seminar/bibliography.bib).
 
+A subtle introduction to Sweave
+========================================================
+
+[A traditional journal paper](https://cimentadaj.github.io/tidyverse_seminars/fifth_seminar/presentations/sweave.pdf)
+
+[The code behind the paper](https://cimentadaj.github.io/tidyverse_seminars/fifth_seminar/presentations/sweave.Rnw)
+
+Taken from [here](http://users.stat.umn.edu/~geyer/Sweave/)
+
 R markdown exercises
 ========================================================
 
