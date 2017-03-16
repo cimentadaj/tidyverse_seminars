@@ -1,0 +1,639 @@
+
+\documentclass{article}
+
+\usepackage{amsmath}
+
+\usepackage{natbib}
+\usepackage{indentfirst}
+
+\DeclareMathOperator{\logit}{logit}
+
+% \VignetteIndexEntry{Logit-Normal GLMM Examples}
+
+\begin{document}
+
+\title{Logit-Normal GLMM Examples}
+\author{Yun Ju Sung \and Charles J. Geyer}
+\maketitle
+
+\section{Examples}
+
+\subsection{Logit-Normal GLMM}
+
+In a Logit-Normal generalized linear mixed model (GLMM), the observed data
+is a vector $y$ whose components are conditionally independent Bernoulli
+random variables given the missing data vector $b$, which is unconditionally
+jointly mean-zero multivariate normal.  The model specification is completed
+by the specification of the \emph{linear predictor}
+\begin{equation} \label{eq:linear-predictor}
+   \eta = X \beta + Z b
+\end{equation}
+and the link function.  In \eqref{eq:linear-predictor} $X$ and $Z$ are
+known matrices (the ``design'' or ``model'' matrices for fixed and random
+effects, respectively), $\beta$ is a vector of unknown parameters
+(``fixed effects''), $b$ is the vector of missing data (``random effects''),
+and the conditional expectation of $y$ given $\eta$ is $\logit^{-1}(\eta)$.
+
+The unknown parameters to be estimated are $\beta$ and any unknown parameters
+determining the variance matrix of $b$.  Usually this variance
+matrix has simple structure and involves only a few unknown parameters.
+For this paper we have written an R package \texttt{bernor} that implements
+the methods of this paper for a class of Logit-Normal GLMM.  The
+class of models our package handles is more easily
+described in R than in mathematical
+notation.  The linear predictor has the form
+\begin{equation} \label{eq:linear-predictor-in-r}
+\verb@eta = X %*% beta + Z %*% (sigma[i] * b)@
+\end{equation}
+where \verb@X@ and \verb@Z@ are the matrices $X$ and $Z$
+in \eqref{eq:linear-predictor} and \verb@X %*% beta@ is the matrix
+multiplication $X \beta$ so the only way
+in which \eqref{eq:linear-predictor} differs
+from \eqref{eq:linear-predictor-in-r} other than notationally is that
+$b$ in \eqref{eq:linear-predictor}
+is replaced by \verb@(sigma[i] * b)@ in \eqref{eq:linear-predictor-in-r},
+which, for readers not familiar with R, has the following interpretation:
+\verb@sigma@ is a vector of unknown parameters, \verb@i@ is a vector of
+the same length as \verb@b@ and having values that are possible indices
+for \verb@sigma@, so \verb@sigma[i]@ is the vector
+$(\sigma_{i_1}, \ldots, \sigma_{i_m})$ in ordinary mathematical notation
+and \verb@*@ in \eqref{eq:linear-predictor-in-r} denotes coordinatewise
+multiplication, so if $z_{j k}$ are the components of the matrix $Z$
+the second term on the right hand side of \eqref{eq:linear-predictor-in-r}
+has $j$-th component
+$$
+   \sum_{k = 1}^m z_{j k} \sigma_{i_k} b_k
+$$
+written in conventional mathematical notation.
+
+We also change assumptions; in \eqref{eq:linear-predictor}
+$b$ is general multivariate normal, but in \eqref{eq:linear-predictor-in-r}
+\verb@b@ is standard multivariate normal
+(mean vector zero, variance matrix the identity).
+Thus the only unknown parameters in our model are the vectors
+\verb@beta@ and \verb@sigma@.  Thus our package only deals with the
+simple situation in which the random effects are (unconditionally)
+independent.
+
+We also allow for independent and identically distributed (IID) data,
+in which case the data $y$ is a matrix with IID columns, each column
+of $y$ modeled as described above.
+
+\subsection{McCulloch's Toy Data}
+
+We start with a simple toy model taken from \citet{mcculloch} and
+also used by \citet{booth} in which the log likelihood can be calculated
+exactly by numerical integration.
+
+These data have the form
+$$
+   y_{i j} = \beta x_i + \sigma b_j
+$$
+where $x_i = i / d$, where $d$ is the number of rows of $y$.
+A simulated data set of this form was given by \citet[Table~2]{booth}.
+This is the data set \verb@booth@ in our \verb@bernor@ package
+(note that our $y$ is the transpose of their $y$ to agree with our
+convention that columns of $y$ are independent).
+
+\subsubsection{Monte Carlo Maximum Likelihood}
+
+Our package provides no optimization capabilities, only evaluation
+of the log likelihood, its derivatives, and related quantities.
+Use either \verb@nlm@ or \verb@optim@ for optimization.
+Here we demonstrate \verb@optim@.
+
+First we attach the data.
+<<booth>>=
+library(bernor)
+data(booth)
+attach(booth)
+@
+
+Then we create functions that calculate the objective function
+(the Monte Carlo log likelihood approximation) and its gradient
+(the gradient is optional, \verb@optim@ can use numerical differentiation
+instead, but supplying the gradient makes for more efficient optimization).
+<<objfun>>=
+moo <- model("gaussian", length(i), 1.0)
+nparm <- length(theta0)
+nfix <- length(mu0)
+
+objfun <- function (theta) {
+    if (!is.numeric(theta)) stop("objfun: theta not numeric")
+    if (length(theta) != nparm) stop("objfun: theta wrong length")
+    mu <- theta[seq(1, nfix)]
+    sigma <- theta[- seq(1, nfix)]
+    .Random.seed <<- .save.Random.seed
+    bnlogl(y, mu, sigma, nmiss, x, z, i, moo)$value
+ }
+
+objgrd <- function (theta) {
+    if (!is.numeric(theta)) stop("objfun: theta not numeric")
+    if (length(theta) != nparm) stop("objfun: theta wrong length")
+    mu <- theta[seq(1, nfix)]
+    sigma <- theta[- seq(1, nfix)]
+    .Random.seed <<- .save.Random.seed
+    bnlogl(y, mu, sigma, nmiss, x, z, i, moo, deriv = 1)$gradient
+ }
+@
+Our functions always use the same random seed (the seed is always restored
+to \verb@.save.Random.seed@ just before any function evaluation).  This
+follows the principle of ``common random numbers'' and assures that the
+function we are evaluating remains the same throughout the optimization.
+(We can later try different random seeds if we chose.)
+
+Then we are ready to try it out.
+<<doit-one>>=
+set.seed(42)
+.save.Random.seed <- .Random.seed
+nmiss <- 1e2
+totalelapsed <- 0
+
+theta.start <- theta0
+lower <- c(-Inf, 0)
+control <- list(fnscale = -10)
+tout <- system.time(
+out <- optim(theta.start, objfun, objgrd, method = "L-BFGS-B",
+         lower = lower, control = control)
+)
+cat("elapsed time", tout[1], "seconds\n")
+totalelapsed <- totalelapsed + tout[1]
+print(out)
+@
+
+\pagebreak[1]
+The result does not agree closely with the exact maximum likelihood
+estimate (MLE), which is
+<<exact-mle>>=
+print(theta.hat.exact)
+@
+from the \verb@booth@ dataset (which we attached above) and
+agrees with the exact MLE
+$(6.132, 1.766)$ reported by \citet[p.~278]{booth} when one takes
+into consideration that that their second parameter is $\sigma^2$ and
+ours is $\sigma$.
+
+It is hard to know what lessons one is supposed to draw from a toy problem.
+In real life we would not, in general, have an exact MLE for comparison.
+We would have for guidance Monte Carlo standard errors
+(Section~\ref{sec:mcmle} below), but rather than calculate them for such
+a small Monte Carlo sample size \verb@nmiss@, let us increase \verb@nmiss@
+and redo
+<<doit-two>>=
+nmiss <- 1e4 ##### for real
+##### nmiss <- 1e3 ##### DEBUG
+
+theta.start <- out$par
+lower <- c(-Inf, 0)
+control <- list(fnscale = out$value)
+tout <- system.time(
+out <- optim(theta.start, objfun, objgrd, method = "L-BFGS-B",
+         lower = lower, control = control)
+)
+cat("elapsed time", tout[1], "seconds\n")
+totalelapsed <- totalelapsed + tout[1]
+print(out)
+@
+And we are now much closer
+<<compare-thetas>>=
+theta.hat <- out$par
+theta.hat - theta.hat.exact
+@
+
+\subsubsection{Monte Carlo Standard Errors} \label{sec:mcmle}
+
+Standard errors for our method involve the matrices $J$, $V$, and $W$
+that are estimated as follows.
+<<jvw>>=
+.Random.seed <<- .save.Random.seed
+tout <- system.time(
+out <- bnlogl(y, theta.hat[1], theta.hat[2], nmiss, x, z, i, moo, deriv = 3)
+)
+cat("elapsed time", tout[1], "seconds\n")
+totalelapsed <- totalelapsed + tout[1]
+print(out)
+tout <- system.time(
+wout <- bnbigw(y, theta.hat[1], theta.hat[2], nmiss, x, z, i, moo)
+)
+cat("elapsed time", tout[1], "seconds\n")
+totalelapsed <- totalelapsed + tout[1]
+print(wout)
+
+nobs <- ncol(y)
+bigJ <- (- out$hessian / nobs)
+eigen(bigJ, symmetric = TRUE, only.values = TRUE)$values
+bigV <- out$bigv
+bigW <- wout
+bigS <- solve(bigJ) %*% (bigV / nobs + bigW / nmiss) %*% solve(bigJ)
+print(bigS)
+@
+% print(bigV / nobs)
+% print(bigW / nmiss)
+
+If we write a function to draw ellipses,
+<<ellipse>>=
+doellipse <- function(m, v, Rsq = qchisq(0.95, 2), npoint = 250,
+    plot = TRUE, add = FALSE, ...) {
+    if (! is.numeric(m)) stop("m not numeric")
+    if (! is.numeric(v)) stop("v not numeric")
+    if (! is.matrix(v)) stop("v not matrix")
+    if (length(m) != 2) stop("m not 2-vector")
+    if (any(dim(v) != 2)) stop("v not 2x2-matrix")
+    phi <- seq(0, 2 * pi, length = npoint)
+    foo <- rbind(cos(phi), sin(phi))
+    rsq <- Rsq / diag(t(foo) %*% solve(v) %*% foo)
+    bar1 <- sqrt(rsq) * foo[1, ] + m[1]
+    bar2 <- sqrt(rsq) * foo[2, ] + m[2]
+    if (plot) {
+        if (! add)
+            plot(bar1, bar2, type = "l", ...)
+        else
+            lines(bar1, bar2, ...)
+    }
+    return(invisible(list(x = bar1, y = bar2)))
+}
+@
+we can use it to produce confidence regions.
+Figure~\ref{fig:fig1} shows a nominal 95\% confidence ellipse.
+<<label=fig1plot,include=FALSE>>=
+doellipse(theta.hat, bigS, xlab = expression(mu), ylab = expression(sigma))
+points(theta0[1], theta0[2], pch = 19)
+bigS0 <- solve(info0) %*% (info0 / nobs + bigw0 / nmiss) %*% solve(info0)
+doellipse(theta.hat, bigS0, add = TRUE, lty = 3)
+@
+\begin{figure}
+\begin{center}
+<<label=fig1,fig=TRUE,echo=FALSE>>=
+<<fig1plot>>
+@
+\end{center}
+\caption{Nominal 95\% confidence ellipse for our analysis
+of the Booth and Hobert data
+using $\texttt{nmiss} = 10^{\Sexpr{log10(nmiss)}}$ (solid line).
+The solid dot is the ``simulation truth'' parameter value (see text).
+Dotted ellipse uses ``true'' Fisher information and ``big $W$.''}
+\label{fig:fig1}
+\end{figure}
+Note that a nominal 95\% confidence ellipse is very large.
+The ``simulation truth'' parameter value
+reported by \citet[p.~275]{booth} is $(5, \sqrt{0.5})$.
+It is found in the \verb@booth@ dataset.
+So the simulation truth is in a nominal 95\% confidence ellipse
+based on the assumption that \verb@nobs@ and \verb@nmiss@ are both
+``large'' (which \verb@nmiss@ is and \verb@nobs@ isn't).
+
+We compare our estimated ``big $J$,'' ``big $V$,'' and ``big $W$''
+matrices with their theoretical counterparts.  Both ``big $J$'' and
+``big $V$'' estimate expected Fisher information (since this model
+is correctly specified).  The exact Fisher information at the
+``simulation truth'' parameter value is found
+in the \verb@booth@ data as \verb@info0@
+<<compare-big-jv>>=
+info0
+bigJ
+bigV
+@
+The exact ``big $W$'' is found
+in the \verb@booth@ data as \verb@bigw0@
+<<compare-big-w>>=
+bigw0
+bigW
+@
+Our estimates are not close, but then $\texttt{nobs} = \Sexpr{ncol(y)}$
+is hardly
+``large'' so this is no surprise.  Another indication that \verb@nobs@
+is quite small is that the nominal 95\% confidence ellipse shown
+in Figure~\ref{fig:fig1} is so large that we have zero significant figure
+accuracy, so, pretending for a moment that this is not just toy data,
+our estimates are scientifically worthless.
+
+\subsection{A Simulation Study}
+
+We would like to have some idea how well our method works, but the analysis
+above gives not a hint because the toy data is ``scientifically worthless''
+and \verb@nobs@ is far to small to apply asymptotics.
+
+Hence we do a simulation study with the same model but larger \verb@nobs@.
+Let us try
+<<nobs-pre>>=
+nobs <- 50
+@
+Now we want the two contributions to the error
+\verb@info0 / nobs + bigw / nmiss@ to be roughly the same size
+so we can see both sampling and Monte Carlo variability.
+Thus we should set
+<<nmiss-pre>>=
+foo <- eigen(info0, symmetric = TRUE, only.values = TRUE)$values
+bar <- eigen(bigw0, symmetric = TRUE, only.values = TRUE)$values
+nmiss <- bar / (foo / nobs)
+print(nmiss)
+@
+Looks like we want about $\texttt{nmiss} = 10$, but that is far too
+small.  Let us try
+<<ns>>=
+nobs <- 500
+nmiss <- 100
+@
+<<sim>>=
+nboot <- 100 ##### for real
+##### nboot <- 5 ##### DEBUG 
+nparm <- length(theta0)
+theta.hat <- array(NA, c(nboot, nparm))
+tstart <- proc.time()[1]
+for (iboot in 1:nboot) {
+    ##### simulate data #####
+    y <- matrix(NA, nrow(y), nobs)
+    for (k in 1:nobs) {
+        b <- rnorm(length(i))
+        eta <- x %*% mu0 + z %*% (sigma0[i] * b)
+        p <- 1 / (1 + exp(- eta))
+        y[ , k] <- as.numeric(runif(length(p)) < p)
+    }
+    ##### calculate estimator #####
+    .save.Random.seed <- .Random.seed
+    nout <- optim(theta.start, objfun, objgrd, method = "L-BFGS-B",
+        lower = lower, control = control)
+    if (nout$convergence != 0)
+        stop("convergence failure")
+    theta.hat[iboot, ] <- nout$par
+}
+tstop <- proc.time()[1]
+cat("elapsed time", tstop - tstart, "seconds\n")
+totalelapsed <- totalelapsed + (tstop - tstart)
+@
+
+Figure~\ref{fig:fig2} gives the scatter plot of Monte Carlo MLE
+with these sample sizes ($\texttt{nobs} = \Sexpr{nobs}$
+and $\texttt{nmiss} = \Sexpr{nmiss}$).
+The solid ellipse in the figure is an asymptotic 95\% coverage ellipse
+using the theoretical expected Fisher information and ``big W''
+(\verb@info0@ and \verb@bigw0@).  The dashed ellipse is what we would have
+if we had very large Monte Carlo sample size \verb@nmiss@, leaving \verb@nobs@
+the same.
+<<label=fig2plot,include=FALSE>>=
+bigS0 <- solve(info0) %*% (info0 / nobs + bigw0 / nmiss) %*% solve(info0)
+bigS0part <- solve(nobs * info0)
+foo <- doellipse(theta0, bigS0, plot = FALSE)
+plot(theta.hat[ , 1], theta.hat[ , 2], xlab = expression(mu),
+    ylab = expression(sigma), xlim = range(theta.hat[ , 1], foo$x),
+    ylim = range(theta.hat[ , 2], foo$y))
+doellipse(theta0, bigS0, add = TRUE)
+doellipse(theta0, bigS0part, add = TRUE, lty = 2)
+points(theta0[1], theta0[2], pch = 19)
+@
+\begin{figure}
+\begin{center}
+<<label=fig2,fig=TRUE,echo=FALSE>>=
+<<fig2plot>>
+@
+\end{center}
+\caption{Simulated MLE with asymptotic 95\% coverage ellipse (solid curve).
+The solid dot is the ``simulation truth'' parameter value (see text).
+Hollow dots are the Monte Carlo MLE's for $\texttt{nboot} = \Sexpr{nboot}$
+simulated data sets.  The observed and missing data sample sizes are
+$\texttt{nobs} = \Sexpr{nobs}$ and $\texttt{nmiss} = \Sexpr{nmiss}$.
+The dashed curve is what the 95\% coverage ellipse would be if we set
+\texttt{nmiss} to infinity.
+}
+\label{fig:fig2}
+\end{figure}
+As can be seen, the asymptotics appear to work well at these sample sizes.
+However, as the dashed curve shows, even if we use a Monte Carlo sample
+size \verb@nmiss@ so large that the Monte Carlo error is negligible,
+the (non--Monte Carlo) sampling variability of the estimator is still
+large, even at $\texttt{nobs} = \Sexpr{nobs}$.  The estimator of the
+fixed effect $\mu$ is fairly precise
+(about one and a half significant figure accuracy),
+but the estimator of the
+random effect scale parameter $\sigma$ is sloppy with zero significant
+figure accuracy.  This analysis casts some doubt on the scientific
+usefulness of GLMM.  It appears that very large sample sizes are necessary
+for scientifically useful inference.
+
+\subsection{The Salamander Data}
+
+\citet[Section~14.5]{pmcc} discuss a ``salamander mating experiment''
+whose data has been used by several groups of statisticians
+as an example of data appropriately analyzed by Logistic-Normal GLMM
+\citep[see][for one analysis and citations of others]{booth},
+although \citet{pmcc} did not use a GLMM and it is not clear
+that GLMM analyses address any of the questions of scientific interest
+for which the data were collected.  Thus in the GLMM context these data
+are also ``toy data'' albeit not especially constructed to be such.
+
+These data are the dataset \verb@salam@ in our \verb@bernor@ package.
+We are using what \citet{booth} call ``Model A'' of \citet{kz}.
+<<salam>>=
+detach(booth)
+rmexcept <- function(l, all.names = FALSE) {
+    foo <- ls(.GlobalEnv, all.names = all.names)
+    bar <- match(foo, l)
+    rm(list = foo[is.na(bar)], envir = .GlobalEnv)
+}
+rmexcept(c("rmexcept", "objfun", "objgrd", "totalelapsed"))
+ls(all.names = TRUE)
+data(salam)
+attach(salam)
+
+nparm <- ncol(x) + length(unique(i))
+nfix <- ncol(x)
+moo <- model("gaussian", length(i), 1.0)
+
+.save.Random.seed <- .Random.seed
+nobs <- ncol(y)
+nmiss <- 1e2
+
+theta.start <- rep(0, nparm)
+names(theta.start) <- c(dimnames(x)[[2]],
+    paste("sigma", c("f", "m"), sep = "_"))
+lower <- rep(0, nparm)
+lower[1:ncol(x)] <- (- Inf)
+
+trust <- 1
+lowert <- pmax(lower, theta.start - trust)
+uppert <- theta.start + trust
+
+control <- list(fnscale = -10)
+tout <- system.time(
+out <- optim(theta.start, objfun, objgrd, method = "L-BFGS-B",
+         lower = lowert, upper = uppert, control = control)
+)
+cat("elapsed time", tout[1], "seconds\n")
+totalelapsed <- totalelapsed + tout[1]
+print(out)
+@
+
+For this dataset we have introduced a new trick: trust regions.
+This is a well known procedure in optimization 
+\citep[Chapter~4]{nw}, although one little known to statisticians.
+Although the approximation of the log likelihood provided by the
+\verb@bnlogl@ function is global in the sense that the function
+provides a result for any valid parameter values, the approximation
+is by no means uniformly accurate, and expecially when the sample
+sizes \verb@nobs@ and \verb@nmiss@ are small, can have spurious local
+maxima ``at infinity.''  Thus one
+constrains the optimization algorithm to stay within a bounded region,
+called the \emph{trust region}.  Although, not the most commonly used
+shape, we use ``box'' trust regions because they are the only shape
+easily implemented in R.  Our trust region is the box centered at
+\verb@theta.start@ and having $L^\infty$ radius \verb@trust@.
+
+As we can see, the trust region has constrained the value of
+\verb@theta.hat[4]@, the W/R fixed effect.  Since, the computing
+time was so small, we repeat with the same trust radius but larger
+\verb@nmiss@.  Of course we use the current best estimate as the
+starting point and center the trust region there.
+<<salam-2>>=
+nmiss <- 1e4 ##### for real
+##### nmiss <- 1e3 ##### DEBUG
+
+theta.start <- out$par
+
+lowert <- pmax(lower, theta.start - trust)
+uppert <- theta.start + trust
+control <- list(fnscale = signif(out$value, 1))
+
+tout <- system.time(
+out <- optim(theta.start, objfun, objgrd, method = "L-BFGS-B",
+         lower = lowert, upper = uppert, control = control)
+)
+cat("elapsed time", tout[1], "seconds\n")
+totalelapsed <- totalelapsed + tout[1]
+print(out, digits = 4)
+@
+
+Now the result is unconstrained by the trust region and presumably
+it would be safe to dispense with it, although it does no harm and
+provides some safety if retained.  Our results agree qualitatively
+but not quantatitively with those of \citet[Table~5]{booth}.
+We fear our \verb@nmiss@ is still too small.  In real life with
+non-toy data we would have no other analyses
+to compare with---\citet{booth} compared with \citet{kz} and perhaps
+others---we would have to use our estimates of $J$, $V$, and $W$
+as guides.  Unfortunately, these data have little replication.
+The ``model A'' we are using does have some replication
+with $\texttt{nobs} = \Sexpr{nobs}$, but this ``replication'' is
+questionable.  The other models considered by \citet{kz} have
+\emph{no} replication (no parts of the observed data are IID).
+In any event, $\texttt{nobs} = \Sexpr{nobs}$ is too small to get
+non-singular estimates of $V$.  So we must avoid ``sandwich estimators''
+and assume $J = V$, as occurs, with a correctly specified model.
+<<salam-2-fish>>=
+theta.hat <- out$par
+mu.hat <- theta.hat[1:nfix]
+sigma.hat <- theta.hat[- (1:nfix)]
+.Random.seed <<- .save.Random.seed
+tout <- system.time(
+    lout <- bnlogl(y, mu.hat, sigma.hat, nmiss, x, z, i, moo, deriv = 2)
+)
+cat("elapsed time", tout[1], "seconds\n")
+totalelapsed <- totalelapsed + tout[1]
+print(lout, digits = 4)
+tout <- system.time(
+    wout <- bnbigw(y, mu.hat, sigma.hat, nmiss, x, z, i, moo)
+)
+cat("elapsed time", tout[1], "seconds\n")
+totalelapsed <- totalelapsed + tout[1]
+print(wout)
+nobs <- ncol(y)
+bigV <- bigJ <- (- lout$hessian / nobs)
+eigen(bigJ, symmetric = TRUE, only.values = TRUE)$values
+bigW <- wout
+bigS <- solve(bigJ) %*% (bigV / nobs + bigW / nmiss) %*% solve(bigJ)
+print(bigS, digits = 4)
+foo <- eigen(bigS, symmetric = TRUE, only.values = TRUE)$values
+print(foo)
+max(foo) / min(foo)
+foo <- rbind(theta.hat, sqrt(diag(bigS)))
+dimnames(foo) <- list(c("estimate", "std. err."), names(theta.hat))
+print(foo, digits = 4)
+@
+The ``standard errors'' here are to be taken with a grain of salt.
+Neither \verb@nobs@ nor \verb@nmiss@ is large enough for the asymptotics
+to be believed.  We produce them only because they are the best we have to
+offer except for a simulation study like that of the preceding section,
+which would be very time consuming and presumably only show that we have
+very little accuracy.
+
+Increasing \verb@nmiss@ is easily done.  It is just a matter of patience.
+Our code does not store all the missing data (at some cost in computer
+time regenerating it when needed) so that arbitrarily large \verb@nmiss@
+can be used, if one is willing to wait for an answer.
+<<load-doit,hidden=TRUE>>=
+load("sally/doit.RData")
+load("sally/doit2.RData")
+@
+We ran, off-line because it took so long, a calculation with
+$\texttt{nmiss} = 10^{\Sexpr{log10(nmiss)}}$.  The results were
+<<doit-show>>=
+print(theta.hat)
+print(lout, digits = 4)
+print(wout, digits = 4)
+bigV <- bigJ <- (- lout$hessian / nobs)
+eigen(bigJ, symmetric = TRUE, only.values = TRUE)$values
+bigW <- wout
+bigS <- solve(bigJ) %*% (bigV / nobs + bigW / nmiss) %*% solve(bigJ)
+print(bigS, digits = 4)
+foo <- eigen(bigS, symmetric = TRUE, only.values = TRUE)$values
+print(foo)
+max(foo) / min(foo)
+foo <- rbind(theta.hat, sqrt(diag(bigS)))
+dimnames(foo) <- list(c("estimate", "std. err."), names(theta.hat))
+print(foo, digits = 4)
+@
+For comparison, \citet{booth} give the following MLE
+<<bhmle>>=
+mu <- c(1.03, 0.32, -1.95, 0.99)
+sigmasq <- c(1.40, 1.25)
+theta.hat.booth <- c(mu, sqrt(sigmasq))
+names(theta.hat.booth) <- names(theta.hat)
+print(theta.hat, digits = 4)
+print(theta.hat.booth, digits = 4)
+@
+(We have independently verified using MCMC that the latter appear to be
+correct to three significant figures).
+
+\begin{thebibliography}{}
+
+\bibitem[Booth and Hobert, 1999]{booth}
+Booth, J.~G. and Hobert, J.~P. (1999)
+\newblock Maximizing generalized linear mixed model likelihoods with
+    an automated Monte Carlo EM algorithm.
+\newblock \emph{Journal of the Royal Statistical Society
+    Series B (Statistical Methodology)}
+% \newblock \emph{J. R. Stat. Soc. Ser. B Stat. Methodol.}
+    61, 265--285.
+
+\bibitem[Ihaka and Gentleman, 1996]{r}
+Ihaka R and Gentleman R. (1996)
+\newblock R: A language for data analysis and graphics.
+\newblock {\em Journal of Computational and Graphical Statistics}
+  5, 299--314.
+
+\bibitem[Karim and Zeger, 1992]{kz}
+Karim, M.~R. and Zeger, S.~L. (1992)
+\newblock Generalized Linear Models with Random Effects:
+    Salamander Mating Revisited.
+\newblock \emph{Biometrics}, 48, 631--644.
+
+\bibitem[McCullagh and Nelder, 1989]{pmcc}
+McCullagh, P. and Nelder, J.~A. (1989)
+\newblock \emph{Generalized Linear Models}, 2nd ed.
+\newblock London: Chapman \& Hall.
+
+\bibitem[McCulloch, 1997]{mcculloch}
+McCulloch, C.~E. (1997)
+\newblock Maximum likelihood algorithms for generalized linear mixed models.
+\newblock \emph{Journal of the American Statistical Association}
+% \newblock \emph{J. Amer. Statist. Assoc.}
+     92, 162--170.
+
+\bibitem[Nocedal and Wright, 1999]{nw}
+Nocedal, J. and Wright, S.~J. (1999)
+\newblock \emph{Numerical Optimization}.
+\newblock New York: Springer-Verlag.
+
+\end{thebibliography}
+
+\end{document}
+
